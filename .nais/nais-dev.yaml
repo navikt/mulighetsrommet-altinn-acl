@@ -28,6 +28,17 @@ spec:
     requests:
       cpu: 250m
       memory: 512Mi
+  env:
+    - name: ALTINN_URL
+      value: https://tt02.altinn.no
+    - name: MASKINPORTEN_URL
+      value: https://ver2.maskinporten.no
   azure:
     application:
       enabled: true
+  maskinporten:
+    enabled: true
+    scopes:
+      consumes:
+        - name: "altinn:serviceowner/reportees"
+        - name: "altinn:serviceowner/rolesandrights"

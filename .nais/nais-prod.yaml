@@ -31,3 +31,8 @@ spec:
   azure:
     application:
       enabled: true
+  env:
+    - name: ALTINN_URL
+      value: https://www.altinn.no
+    - name: MASKINPORTEN_URL
+      value: https://maskinporten.no
