@@ -1,5 +1,6 @@
 package no.nav.amt_altinn_acl.test_util
 
+import no.nav.amt_altinn_acl.test_util.Constants.TEST_JWK
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -33,6 +34,15 @@ class IntegrationTest {
 			oAuthServer.start()
 			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url", oAuthServer::getDiscoveryUrl)
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
+
+			registry.add("altinn.url") { "" }
+			registry.add("altinn.api-key") { "test-altinn-api-key" }
+
+			registry.add("maskinporten.scopes") { "scope1 scope2" }
+			registry.add("maskinporten.client-id") { "abc123" }
+			registry.add("maskinporten.issuer") { "https://test-issuer" }
+			registry.add("maskinporten.token-endpoint") { "TODO" }
+			registry.add("maskinporten.client-jwk") { TEST_JWK }
 		}
 	}
 
