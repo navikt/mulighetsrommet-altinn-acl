@@ -36,6 +36,8 @@ spec:
   azure:
     application:
       enabled: true
+  secureLogs:
+    enabled: true
   maskinporten:
     enabled: true
     scopes:

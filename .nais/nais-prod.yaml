@@ -31,6 +31,8 @@ spec:
   azure:
     application:
       enabled: true
+  secureLogs:
+    enabled: true
   env:
     - name: ALTINN_URL
       value: https://www.altinn.no
