@@ -14,7 +14,7 @@ class AltinnClientImpl(
 	private val client: OkHttpClient = RestClient.baseClient(),
 ) : AltinnClient {
 
-	override fun hentTilknyttedeEnheter(norskIdent: String): List<Enhet> {
+	override fun hentTilknyttedeOrganisasjoner(norskIdent: String): List<Organisasjon> {
 		val request = Request.Builder()
 			.url("$baseUrl/api/serviceowner/reportees?subject=$norskIdent")
 			.addHeader("APIKEY", altinnApiKey)
@@ -34,7 +34,7 @@ class AltinnClientImpl(
 
 			return data
 				.map {
-					Enhet(
+					Organisasjon(
 						type = mapType(it.type) ?: return@map null,
 						organisasjonsnummer = it.organizationNumber ?: return@map null
 					)
@@ -65,10 +65,10 @@ class AltinnClientImpl(
 		}
 	}
 
-	private fun mapType(type: String): Enhet.Type? {
+	private fun mapType(type: String): Organisasjon.Type? {
 		return when (type) {
-			"Enterprise" -> Enhet.Type.OVERORDNET_ENHET
-			"Business" -> Enhet.Type.UNDERENHET
+			"Enterprise" -> Organisasjon.Type.OVERORDNET_ENHET
+			"Business" -> Organisasjon.Type.UNDERENHET
 			else -> null
 		}
 	}

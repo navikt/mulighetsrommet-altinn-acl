@@ -2,13 +2,13 @@ package no.nav.amt_altinn_acl.client.altinn
 
 interface AltinnClient {
 
-	fun hentTilknyttedeEnheter(norskIdent: String): List<Enhet>
+	fun hentTilknyttedeOrganisasjoner(norskIdent: String): List<Organisasjon>
 
 	fun hentRettigheter(norskIdent: String, organisasjonsnummer: String): List<AltinnRettighet>
 
 }
 
-data class Enhet(
+data class Organisasjon(
 	val organisasjonsnummer: String,
 	val type: Type
 ) {

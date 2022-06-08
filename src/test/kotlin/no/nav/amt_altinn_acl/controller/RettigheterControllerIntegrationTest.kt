@@ -8,22 +8,22 @@ import org.junit.jupiter.api.Test
 class RettigheterControllerIntegrationTest : IntegrationTest() {
 
 	@Test
-	fun `hentAlleRettigheter - should return 401 when not authenticated`() {
+	fun `hentRettigheter - should return 401 when not authenticated`() {
 		val response = sendRequest(
 			method = "POST",
-			path = "/api/v1/rettighet/hent-alle",
-			body = """{"norskIdent": "4273684"}"""".toJsonRequestBody()
+			path = "/api/v1/rettighet/hent",
+			body = """{"norskIdent": "4273684", "rettighetIder": []}""".toJsonRequestBody()
 		)
 
 		response.code shouldBe 401
 	}
 
 	@Test
-	fun `hentAlleRettigheter - should return 403 when not machine-to-machine request`() {
+	fun `hentRettigheter - should return 403 when not machine-to-machine request`() {
 		val response = sendRequest(
 			method = "POST",
-			path = "/api/v1/rettighet/hent-alle",
-			body = """{"norskIdent": "4273684"}"""".toJsonRequestBody(),
+			path = "/api/v1/rettighet/hent",
+			body = """{"norskIdent": "4273684", "rettighetIder": []}""".toJsonRequestBody(),
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdToken()}")
 		)
 
@@ -31,20 +31,31 @@ class RettigheterControllerIntegrationTest : IntegrationTest() {
 	}
 
 	@Test
-	fun `hentAlleRettigheter - should return 200 with correct response`() {
+	fun `hentRettigheter - should return 200 with correct response`() {
+		val orgnr = "1234567"
+		val rettighetId1 = 1234L
+		val rettighetId2 = 5678L
+		val rettighetId3 = 34872L
+
+		mockMaskinportenHttpClient.enqueueTokenResponse()
+
+		mockAltinnHttpClient.enqueueHentTilknyttedeEnheterResponse(listOf(orgnr))
+
+		mockAltinnHttpClient.enqueueHentRettigheterResponse(listOf(rettighetId1, rettighetId2, rettighetId3))
+
 		val response = sendRequest(
 			method = "POST",
-			path = "/api/v1/rettighet/hent-alle",
-			body = """{"norskIdent": "4273684"}"""".toJsonRequestBody(),
+			path = "/api/v1/rettighet/hent",
+			body = """{"norskIdent": "4273684", "rettighetIder": ["1234", "5678"]}""".toJsonRequestBody(),
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}")
 		)
 
 		val expectedJson = """
-			{"rettigheter":[]}
+			{"rettigheter":[{"id":"1234","organisasjonsnummer":"1234567"},{"id":"5678","organisasjonsnummer":"1234567"}]}
 		""".trimIndent()
 
-		response.body?.string() shouldBe expectedJson
 		response.code shouldBe 200
+		response.body?.string() shouldBe expectedJson
 	}
 
 }

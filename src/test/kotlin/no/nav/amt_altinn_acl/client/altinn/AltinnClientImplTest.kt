@@ -28,7 +28,7 @@ class AltinnClientImplTest {
 	}
 
 	@Test
-	fun `hentTilknyttedeEnheter - skal lage riktig request og parse response`() {
+	fun `hentTilknyttedeOrganisasjoner - skal lage riktig request og parse response`() {
 		val altinnClient = AltinnClientImpl(
 			baseUrl = mockServerUrl(),
 			altinnApiKey = "api-key",
@@ -37,42 +37,42 @@ class AltinnClientImplTest {
 
 		val jsonResponse = """
 			[
-			{
-				"Name": "LAGSPORT PLUTSELIG ",
-				"Type": "Person",
-				"SocialSecurityNumber": "11111111111"
-			},
-			{
-				"Name": "NONFIGURATIV KOMFORTABEL HUND DA",
-				"Type": "Enterprise",
-				"OrganizationNumber": "999987004",
-				"OrganizationForm": "DA",
-				"Status": "Active"
-			},
-			{
-				"Name": "NONFIGURATIV KOMFORTABEL HUND DA",
-				"Type": "Business",
-				"OrganizationNumber": "999919596",
-				"ParentOrganizationNumber": "999987004",
-				"OrganizationForm": "BEDR",
-				"Status": "Active"
-			},
-			{
-				"Name": "NØDVENDIG NESTE KATT INDUSTRI",
-				"Type": "Enterprise",
-				"OrganizationNumber": "999906097",
-				"OrganizationForm": "ENK",
-				"Status": "Active"
-			},
-			{
-				"Name": "NØDVENDIG NESTE KATT INDUSTRI",
-				"Type": "Business",
-				"OrganizationNumber": "999928026",
-				"ParentOrganizationNumber": "999906097",
-				"OrganizationForm": "BEDR",
-				"Status": "Active"
-			}
-		]
+				{
+					"Name": "LAGSPORT PLUTSELIG ",
+					"Type": "Person",
+					"SocialSecurityNumber": "11111111111"
+				},
+				{
+					"Name": "NONFIGURATIV KOMFORTABEL HUND DA",
+					"Type": "Enterprise",
+					"OrganizationNumber": "999987004",
+					"OrganizationForm": "DA",
+					"Status": "Active"
+				},
+				{
+					"Name": "NONFIGURATIV KOMFORTABEL HUND DA",
+					"Type": "Business",
+					"OrganizationNumber": "999919596",
+					"ParentOrganizationNumber": "999987004",
+					"OrganizationForm": "BEDR",
+					"Status": "Active"
+				},
+				{
+					"Name": "NØDVENDIG NESTE KATT INDUSTRI",
+					"Type": "Enterprise",
+					"OrganizationNumber": "999906097",
+					"OrganizationForm": "ENK",
+					"Status": "Active"
+				},
+				{
+					"Name": "NØDVENDIG NESTE KATT INDUSTRI",
+					"Type": "Business",
+					"OrganizationNumber": "999928026",
+					"ParentOrganizationNumber": "999906097",
+					"OrganizationForm": "BEDR",
+					"Status": "Active"
+				}
+			]
 		""".trimIndent()
 
 		mockServer.enqueue(
@@ -83,7 +83,7 @@ class AltinnClientImplTest {
 
 		val norskIdent = "123456"
 
-		val enheter = altinnClient.hentTilknyttedeEnheter(norskIdent)
+		val organisasjoner = altinnClient.hentTilknyttedeOrganisasjoner(norskIdent)
 
 		val request = mockServer.takeRequest()
 
@@ -92,9 +92,9 @@ class AltinnClientImplTest {
 		request.headers["APIKEY"] shouldBe "api-key"
 		request.headers["Authorization"] shouldBe "Bearer TOKEN"
 
-		enheter shouldHaveSize 4
-		enheter.filter { it.type == Enhet.Type.OVERORDNET_ENHET } shouldHaveSize 2
-		enheter.filter { it.type == Enhet.Type.UNDERENHET } shouldHaveSize 2
+		organisasjoner shouldHaveSize 4
+		organisasjoner.filter { it.type == Organisasjon.Type.OVERORDNET_ENHET } shouldHaveSize 2
+		organisasjoner.filter { it.type == Organisasjon.Type.UNDERENHET } shouldHaveSize 2
 	}
 
 	@Test

@@ -1,10 +1,13 @@
 package no.nav.amt_altinn_acl.test_util
 
 import no.nav.amt_altinn_acl.test_util.Constants.TEST_JWK
+import no.nav.amt_altinn_acl.test_util.mock_clients.MockAltinnHttpClient
+import no.nav.amt_altinn_acl.test_util.mock_clients.MockMaskinportenHttpClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
@@ -25,24 +28,42 @@ class IntegrationTest {
 
 	private val client = OkHttpClient()
 
+	@BeforeEach
+	fun cleanDatabase() {
+		DbTestDataUtils.cleanDatabase(postgresDataSource)
+	}
+
 	companion object {
 		val oAuthServer = MockOAuthServer()
+		val mockAltinnHttpClient = MockAltinnHttpClient()
+		val mockMaskinportenHttpClient = MockMaskinportenHttpClient()
+		val postgresDataSource = SingletonPostgresContainer.getDataSource()
 
 		@JvmStatic
 		@DynamicPropertySource
 		fun registerProperties(registry: DynamicPropertyRegistry) {
 			oAuthServer.start()
+			mockAltinnHttpClient.start()
+			mockMaskinportenHttpClient.start()
+
 			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url", oAuthServer::getDiscoveryUrl)
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
 
-			registry.add("altinn.url") { "" }
+			registry.add("altinn.url", mockAltinnHttpClient::serverUrl)
 			registry.add("altinn.api-key") { "test-altinn-api-key" }
 
 			registry.add("maskinporten.scopes") { "scope1 scope2" }
 			registry.add("maskinporten.client-id") { "abc123" }
 			registry.add("maskinporten.issuer") { "https://test-issuer" }
-			registry.add("maskinporten.token-endpoint") { "TODO" }
+			registry.add("maskinporten.token-endpoint") { mockMaskinportenHttpClient.serverUrl() }
 			registry.add("maskinporten.client-jwk") { TEST_JWK }
+
+			val container = SingletonPostgresContainer.getContainer()
+
+			registry.add("spring.datasource.url") { container.jdbcUrl }
+			registry.add("spring.datasource.username") { container.username }
+			registry.add("spring.datasource.password") { container.password }
+			registry.add("spring.datasource.hikari.maximum-pool-size") { 3 }
 		}
 	}
 

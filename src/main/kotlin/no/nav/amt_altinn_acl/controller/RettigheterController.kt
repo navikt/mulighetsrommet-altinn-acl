@@ -1,6 +1,7 @@
 package no.nav.amt_altinn_acl.controller
 
 import no.nav.amt_altinn_acl.service.AuthService
+import no.nav.amt_altinn_acl.service.RettigheterService
 import no.nav.amt_altinn_acl.utils.Issuer
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.PostMapping
@@ -11,28 +12,26 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/rettighet")
 class RettigheterController(
-	private val authService: AuthService
+	private val authService: AuthService,
+	private val rettigheterService: RettigheterService
 ) {
 
-	@PostMapping("/hent-alle")
+	@PostMapping("/hent")
 	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	fun hentAlleRettigheter(@RequestBody request: HentRettigheter.Request): HentRettigheter.Response {
+	fun hentRettigheter(@RequestBody request: HentRettigheter.Request): HentRettigheter.Response {
 		authService.verifyRequestIsMachineToMachine()
 
-		return HentRettigheter.Response(emptyList())
-	}
+		val rettigheter = rettigheterService.hentAlleRettigheter(request.norskIdent)
+			.filter { request.rettighetIder.contains(it.rettighetId) }
+			.map { HentRettigheter.Response.Rettighet(it.rettighetId, it.organisasjonsnummmer) }
 
-	@PostMapping("/har-rettighet")
-	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
-	fun harRettighet(@RequestBody request: HarRettighet.Request): HarRettighet.Response {
-		authService.verifyRequestIsMachineToMachine()
-
-		return HarRettighet.Response(false)
+		return HentRettigheter.Response(rettigheter)
 	}
 
 	object HentRettigheter {
 		data class Request(
-			val norskIdent: String
+			val norskIdent: String,
+			val rettighetIder: List<String>,
 		)
 
 		data class Response(
@@ -40,21 +39,9 @@ class RettigheterController(
 		) {
 			data class Rettighet(
 				val id: String,
-				val navn: String,
 				val organisasjonsnummer: String,
 			)
 		}
-	}
-
-	object HarRettighet {
-		data class Request(
-			val norskIdent: String,
-			val rettighetId: String
-		)
-
-		data class Response(
-			val harRettighet: Boolean
-		)
 	}
 
 }
