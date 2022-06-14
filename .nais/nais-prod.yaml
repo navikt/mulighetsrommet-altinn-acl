@@ -46,3 +46,5 @@ spec:
       value: https://www.altinn.no
     - name: MASKINPORTEN_URL
       value: https://maskinporten.no
+  envFrom:
+    - secret: altinn-api-key

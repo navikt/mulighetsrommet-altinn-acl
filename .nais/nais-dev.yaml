@@ -33,6 +33,8 @@ spec:
       value: https://tt02.altinn.no
     - name: MASKINPORTEN_URL
       value: https://ver2.maskinporten.no
+  envFrom:
+    - secret: altinn-api-key
   azure:
     application:
       enabled: true
