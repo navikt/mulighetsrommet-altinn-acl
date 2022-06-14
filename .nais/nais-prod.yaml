@@ -33,6 +33,10 @@ spec:
       enabled: true
   secureLogs:
     enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: amt-tiltak
   gcp:
     sqlInstances:
       - name: amt-altinn-acl
