@@ -27,8 +27,9 @@ class RettigheterCacheRepository(
 	fun upsertRettigheter(norskIdent: String, rettigheterJson: String, expiresAfter: ZonedDateTime) {
 		val sql = """
 			INSERT INTO rettigheter_cache(norsk_ident, rettigheter_json, expires_after)
-			VALUES (:norsk_ident, to_jsonb(:rettigheter_json), :expires_after)
-			ON CONFLICT (norsk_ident) DO UPDATE SET rettigheter_json = to_jsonb(:rettigheter_json), expires_after = :expires_after
+			VALUES (:norsk_ident, cast(:rettigheter_json as json), :expires_after)
+			ON CONFLICT (norsk_ident) DO UPDATE
+			SET rettigheter_json = cast(:rettigheter_json as json), expires_after = :expires_after
 		""".trimIndent()
 
 		val parameters = MapSqlParameterSource()
@@ -50,12 +51,12 @@ class RettigheterCacheRepository(
 			.firstOrNull()
 	}
 
-	fun slettRettigheter(id: Long) {
+	fun slettRettigheter(norskIdent: String) {
 		val sql = """
-			DELETE FROM rettigheter_cache WHERE id = :id
+			DELETE FROM rettigheter_cache WHERE norsk_ident = :norsk_ident
 		""".trimIndent()
 
-		val parameters = MapSqlParameterSource("id", id)
+		val parameters = MapSqlParameterSource("norsk_ident", norskIdent)
 
 		template.update(sql, parameters)
 	}

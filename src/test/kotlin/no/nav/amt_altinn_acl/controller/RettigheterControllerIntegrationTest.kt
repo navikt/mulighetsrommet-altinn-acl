@@ -58,4 +58,44 @@ class RettigheterControllerIntegrationTest : IntegrationTest() {
 		response.body?.string() shouldBe expectedJson
 	}
 
+	@Test
+	fun `hentRettigheter - should return cache response from altinn`() {
+		val orgnr = "1234567"
+		val rettighetId1 = 1234L
+		val rettighetId2 = 5678L
+		val rettighetId3 = 34872L
+
+		mockMaskinportenHttpClient.enqueueTokenResponse()
+
+		mockAltinnHttpClient.enqueueHentTilknyttedeEnheterResponse(listOf(orgnr))
+
+		mockAltinnHttpClient.enqueueHentRettigheterResponse(listOf(rettighetId1, rettighetId2, rettighetId3))
+
+		val response1 = sendRequest(
+			method = "POST",
+			path = "/api/v1/rettighet/hent",
+			body = """{"norskIdent": "4273684", "rettighetIder": ["1234", "5678"]}""".toJsonRequestBody(),
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}")
+		)
+
+		val response2 = sendRequest(
+			method = "POST",
+			path = "/api/v1/rettighet/hent",
+			body = """{"norskIdent": "4273684", "rettighetIder": ["1234", "5678"]}""".toJsonRequestBody(),
+			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}")
+		)
+
+		val expectedJson = """
+			{"rettigheter":[{"id":"1234","organisasjonsnummer":"1234567"},{"id":"5678","organisasjonsnummer":"1234567"}]}
+		""".trimIndent()
+
+		response1.code shouldBe 200
+		response1.body?.string() shouldBe expectedJson
+
+		response2.code shouldBe 200
+		response2.body?.string() shouldBe expectedJson
+
+		mockAltinnHttpClient.requestCount() shouldBe 2
+	}
+
 }

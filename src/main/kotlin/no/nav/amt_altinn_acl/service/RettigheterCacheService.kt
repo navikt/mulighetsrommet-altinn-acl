@@ -11,9 +11,13 @@ class RettigheterCacheService(
 	private val rettigheterCacheRepository: RettigheterCacheRepository
 ) {
 
+	companion object {
+		const val CACHE_EXPIRATION_HOURS = 12L
+	}
+
 	fun cacheRettigheter(norskIdent: String, rettigheter: List<Rettighet>) {
 		val json = JsonUtils.toJsonString(CachetRettigheter(rettigheter = rettigheter))
-		val expiration = ZonedDateTime.now().plusHours(1)
+		val expiration = ZonedDateTime.now().plusHours(CACHE_EXPIRATION_HOURS)
 
 		rettigheterCacheRepository.upsertRettigheter(norskIdent, json, expiration)
 	}
@@ -21,10 +25,10 @@ class RettigheterCacheService(
 	fun hentAlleCachedeRettigheter(norskIdent: String): List<Rettighet>? {
 		val cachetRettigheterDbo = rettigheterCacheRepository.hentRettigheter(norskIdent) ?: return null
 
-		val hasExpired = cachetRettigheterDbo.expiresAfter.isAfter(ZonedDateTime.now())
+		val hasExpired = ZonedDateTime.now().isAfter(cachetRettigheterDbo.expiresAfter)
 
 		if (hasExpired) {
-			rettigheterCacheRepository.slettRettigheter(cachetRettigheterDbo.id)
+			rettigheterCacheRepository.slettRettigheter(norskIdent)
 			return null
 		}
 
@@ -35,7 +39,7 @@ class RettigheterCacheService(
 
 	data class CachetRettigheter(
 		val version: Int = 1,
-		val rettigheter: List<Rettighet>
+		val rettigheter: List<Rettighet>,
 	)
 
 }

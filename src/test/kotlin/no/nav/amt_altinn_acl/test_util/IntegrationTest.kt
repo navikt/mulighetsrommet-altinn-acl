@@ -7,7 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
@@ -28,9 +28,11 @@ class IntegrationTest {
 
 	private val client = OkHttpClient()
 
-	@BeforeEach
+	@AfterEach
 	fun cleanDatabase() {
 		DbTestDataUtils.cleanDatabase(postgresDataSource)
+		mockAltinnHttpClient.resetRequestCount()
+		mockMaskinportenHttpClient.resetRequestCount()
 	}
 
 	companion object {
