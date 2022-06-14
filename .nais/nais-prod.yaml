@@ -52,3 +52,9 @@ spec:
       value: https://maskinporten.no
   envFrom:
     - secret: altinn-api-key
+  maskinporten:
+    enabled: true
+    scopes:
+      consumes:
+        - name: "altinn:serviceowner/reportees"
+        - name: "altinn:serviceowner/rolesandrights"
