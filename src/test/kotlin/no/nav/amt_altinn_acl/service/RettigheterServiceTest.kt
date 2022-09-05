@@ -42,7 +42,7 @@ class RettigheterServiceTest {
 			  "rettigheter": [
 				{
 				  "rettighetId": "$rettighetId",
-				  "organisasjonsnummmer": "$organisasjonsnummer"
+				  "organisasjonsnummer": "$organisasjonsnummer"
 				}
 			  ]
        		 }
@@ -53,7 +53,7 @@ class RettigheterServiceTest {
 
 		rettigheter shouldHaveSize 1
 		rettigheter.first().rettighetId shouldBe rettighetId
-		rettigheter.first().organisasjonsnummmer shouldBe organisasjonsnummer
+		rettigheter.first().organisasjonsnummer shouldBe organisasjonsnummer
 
 		verify(exactly = 0) {
 			altinnClient.hentRettigheter(any(), any())

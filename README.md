@@ -13,7 +13,7 @@ values ('<fnr>',
           "rettigheter": [
             {
               "rettighetId": "9999999",
-              "organisasjonsnummmer": "<orgnr>"
+              "organisasjonsnummer": "<orgnr>"
             }
           ]
         }',

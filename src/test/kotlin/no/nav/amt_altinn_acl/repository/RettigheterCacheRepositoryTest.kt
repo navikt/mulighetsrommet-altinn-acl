@@ -40,7 +40,7 @@ class RettigheterCacheRepositoryTest {
 		val cachetRettighet = repository.hentRettigheter(norskIdent)
 
 		val expectedJson = """
-			{"version":1,"rettigheter":[{"organisasjonsnummmer":"123","rettighetId":"4367842"}]}
+			{"version":1,"rettigheter":[{"organisasjonsnummer":"123","rettighetId":"4367842"}]}
 		""".trimIndent()
 
 		cachetRettighet shouldNotBe null
@@ -70,7 +70,7 @@ class RettigheterCacheRepositoryTest {
 		val cachetRettighet = repository.hentRettigheter(norskIdent)
 
 		val expectedJson = """
-			{"version":1,"rettigheter":[{"organisasjonsnummmer":"784932","rettighetId":"11111111"}]}
+			{"version":1,"rettigheter":[{"organisasjonsnummer":"784932","rettighetId":"11111111"}]}
 		""".trimIndent()
 
 		cachetRettighet shouldNotBe null

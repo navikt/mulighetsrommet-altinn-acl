@@ -1,8 +1,8 @@
 package no.nav.amt_altinn_acl.service
 
 import no.nav.amt_altinn_acl.domain.AltinnRettighet
-import no.nav.amt_altinn_acl.domain.TiltaksarrangorRoller
 import no.nav.amt_altinn_acl.domain.TiltaksarrangorRolleType
+import no.nav.amt_altinn_acl.domain.TiltaksarrangorRoller
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
@@ -24,7 +24,7 @@ class RolleService(
 		rettigheter.forEach {
 			val rolle = mapAltinnRettighetTilRolle(it.rettighetId) ?: return@forEach
 
-			val roller = altinnRollerMap.computeIfAbsent(it.organisasjonsnummmer) { mutableListOf() }
+			val roller = altinnRollerMap.computeIfAbsent(it.organisasjonsnummer) { mutableListOf() }
 
 			roller.add(rolle)
 		}

@@ -39,7 +39,7 @@ class RolleServiceTest {
 
 		roller shouldHaveSize 1
 
-		roller.first().organisasjonsnummmer shouldBe organisasjonsnummer
+		roller.first().organisasjonsnummer shouldBe organisasjonsnummer
 		roller.first().roller shouldBe listOf(TiltaksarrangorRolleType.KOORDINATOR)
 	}
 

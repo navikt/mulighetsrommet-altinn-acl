@@ -25,7 +25,7 @@ class RolleController(
 		val roller = rolleService.hentTiltaksarrangorRoller(norskIdent)
 
 		return HentRollerResponse(
-			roller.map { HentRollerResponse.TiltaksarrangorRoller(it.organisasjonsnummmer, it.roller) }
+			roller.map { HentRollerResponse.TiltaksarrangorRoller(it.organisasjonsnummer, it.roller) }
 		)
 	}
 

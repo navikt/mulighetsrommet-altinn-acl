@@ -38,7 +38,7 @@ class RettigheterService(
 			.flatMap {
 				altinnClient.hentRettigheter(norskIdent, it.organisasjonsnummer)
 					.map { r -> AltinnRettighet(
-						organisasjonsnummmer = it.organisasjonsnummer,
+						organisasjonsnummer = it.organisasjonsnummer,
 						rettighetId = r.rettighetId.toString()
 					) }
 					.stream()

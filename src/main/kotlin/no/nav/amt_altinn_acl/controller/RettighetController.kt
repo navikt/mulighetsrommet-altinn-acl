@@ -23,7 +23,7 @@ class RettighetController(
 
 		val rettigheter = rettigheterService.hentAlleRettigheter(request.norskIdent)
 			.filter { request.rettighetIder.contains(it.rettighetId) }
-			.map { HentRettigheter.Response.Rettighet(it.rettighetId, it.organisasjonsnummmer) }
+			.map { HentRettigheter.Response.Rettighet(it.rettighetId, it.organisasjonsnummer) }
 
 		return HentRettigheter.Response(rettigheter)
 	}
