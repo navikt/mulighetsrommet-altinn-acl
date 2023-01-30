@@ -16,7 +16,7 @@ repositories {
 }
 
 val commonVersion = "2.2022.05.13_07.24-6eadb37dec31"
-val testcontainersVersion = "1.16.0"
+val testcontainersVersion = "1.17.6"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
@@ -40,7 +40,7 @@ dependencies {
     
     implementation("no.nav.security:token-validation-spring:2.0.20")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    runtimeOnly("org.postgresql:postgresql:42.3.3")
+    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.12.0")
@@ -49,8 +49,6 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.3.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
     testImplementation("no.nav.security:mock-oauth2-server:0.4.7")
-    
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
