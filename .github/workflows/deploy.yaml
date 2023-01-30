@@ -70,5 +70,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: Release ${{ env.IMAGE_TAG }}
-          tag_name: ${{ env.IMAGE_TAG }}
+          tag_name: release_${{ env.IMAGE_TAG }}
           prerelease: false
