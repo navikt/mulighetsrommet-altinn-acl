@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "2.7.8"
-    id("io.spring.dependency-management") version "1.0.15.RELEASE"
+    id("org.springframework.boot") version "3.0.2"
+    id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
 }
@@ -13,9 +13,10 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://jitpack.io") }
 }
 
-val commonVersion = "2.2022.05.13_07.24-6eadb37dec31"
+val commonVersion = "2023.01.30_16.31-5977997e3a67"
 val testcontainersVersion = "1.17.6"
 
 dependencies {
@@ -34,11 +35,11 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("org.flywaydb:flyway-core")
     
-    implementation("no.nav.common:log:$commonVersion")
-    implementation("no.nav.common:rest:$commonVersion")
-    implementation("no.nav.common:token-client:$commonVersion")
+    implementation("com.github.navikt.common-java-modules:log:$commonVersion")
+    implementation("com.github.navikt.common-java-modules:rest:$commonVersion")
+    implementation("com.github.navikt.common-java-modules:token-client:$commonVersion")
     
-    implementation("no.nav.security:token-validation-spring:2.0.20")
+    implementation("no.nav.security:token-validation-spring:3.0.2")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     runtimeOnly("org.postgresql:postgresql")
 
