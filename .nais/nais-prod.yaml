@@ -19,6 +19,11 @@ spec:
   liveness:
     path: /internal/health/liveness
     initialDelay: 20
+  startup:
+    path: /internal/health/liveness
+    initialDelay: 10
+    failureThreshold: 30
+    periodSeconds: 5
   replicas:
     min: 2
     max: 3
