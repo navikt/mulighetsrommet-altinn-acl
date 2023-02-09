@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 class InternalController (
 	private val altinnClient: AltinnClient
 ) {
-
 	@Unprotected
 	@GetMapping("/altinn/organisasjoner")
 	fun hentOrganisasjoner(
