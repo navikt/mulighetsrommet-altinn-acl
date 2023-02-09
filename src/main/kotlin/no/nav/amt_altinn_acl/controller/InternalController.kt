@@ -3,6 +3,7 @@ package no.nav.amt_altinn_acl.controller
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.amt_altinn_acl.client.altinn.AltinnClient
 import no.nav.amt_altinn_acl.client.altinn.AltinnRettighet
+import no.nav.amt_altinn_acl.jobs.AltinnUpdater
 import no.nav.amt_altinn_acl.utils.SecureLog.secureLog
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/internal")
 class InternalController (
-	private val altinnClient: AltinnClient
+	private val altinnClient: AltinnClient,
+	private val altinnUpdater: AltinnUpdater
 ) {
 	@Unprotected
 	@GetMapping("/altinn/organisasjoner")
@@ -45,6 +47,22 @@ class InternalController (
 		}
 		secureLog.error("Attempted external access to /altinn/rettigheter")
 		throw RuntimeException("No access")
+	}
+
+	@Unprotected
+	@GetMapping("/altinn/synkroniser")
+	fun synkroniserAltinnRettigheter(
+		servlet: HttpServletRequest,
+	) {
+		secureLog.info("Reached /altinn/synkroniser")
+		if (isInternal(servlet)) {
+			secureLog.info("Passed internal /altinn/synkroniser")
+			altinnUpdater.update()
+		}
+		else {
+			secureLog.error("Attempted external access to /altinn/synkroniser")
+			throw RuntimeException("No access")
+		}
 	}
 
 	private fun isInternal(servlet: HttpServletRequest): Boolean {
