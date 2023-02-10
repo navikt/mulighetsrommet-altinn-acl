@@ -2,9 +2,16 @@ package no.nav.amt_altinn_acl.controller
 
 import io.kotest.matchers.shouldBe
 import no.nav.amt_altinn_acl.test_util.IntegrationTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class RolleControllerIntegrationTest : IntegrationTest() {
+
+	@AfterEach
+	internal fun tearDown() {
+		mockAltinnHttpClient.resetHttpServer()
+	}
 
 	@Test
 	fun `hentTiltaksarrangorRoller - should return 401 when not authenticated`() {
@@ -29,23 +36,23 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 
 	@Test
 	fun `hentTiltaksarrangorRoller - should return 200 with correct response`() {
+		val norskIdent = UUID.randomUUID().toString()
 		val orgnr = "1234567"
-		val serviceCode1 = "787687"
 
 		mockMaskinportenHttpClient.enqueueTokenResponse()
 
-		mockAltinnHttpClient.enqueueHentTilknyttedeEnheterResponse(listOf(orgnr))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, altinnKoordinatorServiceKode, listOf(orgnr))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, altinnVeilederServiceKode, listOf(orgnr))
 
-		mockAltinnHttpClient.enqueueHentRettigheterResponse(listOf(altinnKoordinatorServiceKode, altinnVeilederServiceKode, serviceCode1))
 
 		val response = sendRequest(
 			method = "GET",
-			path = "/api/v1/rolle/tiltaksarrangor?norskIdent=4273684",
+			path = "/api/v1/rolle/tiltaksarrangor?norskIdent=$norskIdent",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}")
 		)
 
 		val expectedJson = """
-			{"roller":[{"organisasjonsnummer":"1234567","roller":["KOORDINATOR","VEILEDER"]}]}
+			{"roller":[{"organisasjonsnummer":"$orgnr","roller":["VEILEDER","KOORDINATOR"]}]}
 		""".trimIndent()
 
 		response.code shouldBe 200
@@ -54,29 +61,28 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 
 	@Test
 	fun `hentTiltaksarrangorRoller - should return cached response from altinn`() {
+		val personIdent = UUID.randomUUID().toString()
 		val orgnr = "1234567"
-		val serviceCode1 = "85403"
 
 		mockMaskinportenHttpClient.enqueueTokenResponse()
 
-		mockAltinnHttpClient.enqueueHentTilknyttedeEnheterResponse(listOf(orgnr))
-
-		mockAltinnHttpClient.enqueueHentRettigheterResponse(listOf(altinnKoordinatorServiceKode, serviceCode1))
+		mockAltinnHttpClient.addReporteeResponse(personIdent, altinnKoordinatorServiceKode, listOf(orgnr))
+		mockAltinnHttpClient.addReporteeResponse(personIdent, altinnVeilederServiceKode, emptyList())
 
 		val response1 = sendRequest(
 			method = "GET",
-			path = "/api/v1/rolle/tiltaksarrangor?norskIdent=4273684",
+			path = "/api/v1/rolle/tiltaksarrangor?norskIdent=$personIdent",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}")
 		)
 
 		val response2 = sendRequest(
 			method = "GET",
-			path = "/api/v1/rolle/tiltaksarrangor?norskIdent=4273684",
+			path = "/api/v1/rolle/tiltaksarrangor?norskIdent=$personIdent",
 			headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}")
 		)
 
 		val expectedJson = """
-			{"roller":[{"organisasjonsnummer":"1234567","roller":["KOORDINATOR"]}]}
+			{"roller":[{"organisasjonsnummer":"$orgnr","roller":["KOORDINATOR"]}]}
 		""".trimIndent()
 
 		response1.code shouldBe 200
