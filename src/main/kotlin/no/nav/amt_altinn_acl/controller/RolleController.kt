@@ -1,6 +1,6 @@
 package no.nav.amt_altinn_acl.controller
 
-import no.nav.amt_altinn_acl.domain.TiltaksarrangorRolleType
+import no.nav.amt_altinn_acl.domain.RolleType
 import no.nav.amt_altinn_acl.service.AuthService
 import no.nav.amt_altinn_acl.service.RolleService
 import no.nav.amt_altinn_acl.utils.Issuer
@@ -22,10 +22,9 @@ class RolleController(
 	fun hentTiltaksarrangorRoller(@RequestParam norskIdent: String): HentRollerResponse {
 		authService.verifyRequestIsMachineToMachine()
 
-		val roller = rolleService.hentTiltaksarrangorRoller(norskIdent)
-
+		val roller = rolleService.getRollerForPerson(norskIdent)
 		return HentRollerResponse(
-			roller.map { HentRollerResponse.TiltaksarrangorRoller(it.organisasjonsnummer, it.roller) }
+			roller.map { rolle -> HentRollerResponse.TiltaksarrangorRoller(rolle.organisasjonsnummer, rolle.roller.map { it.rolleType }) }
 		)
 	}
 
@@ -34,7 +33,7 @@ class RolleController(
 	) {
 		data class TiltaksarrangorRoller(
 			val organisasjonsnummer: String,
-			val roller: List<TiltaksarrangorRolleType>,
+			val roller: List<RolleType>,
 		)
 	}
 
