@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "2.0.10"
+    val kotlinVersion = "2.0.20"
 
     id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
@@ -27,9 +27,6 @@ val okHttpVersion = "4.12.0"
 val mockkVersion = "1.13.12"
 val kotestVersion = "5.9.1"
 val mockOauth2ServerVersion = "2.1.9"
-
-extra["postgresql.version"] = "42.7.2"
-extra["jackson-bom.version"] = "2.17.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
