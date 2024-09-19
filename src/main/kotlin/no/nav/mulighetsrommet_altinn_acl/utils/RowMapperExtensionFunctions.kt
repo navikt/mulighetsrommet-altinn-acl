@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.utils
+package no.nav.mulighetsrommet_altinn_acl.utils
 
 import java.sql.ResultSet
 import java.time.Instant
@@ -10,6 +10,5 @@ fun ResultSet.getNullableZonedDateTime(columnLabel: String): ZonedDateTime? {
 	return ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp.time), ZoneOffset.systemDefault())
 }
 
-fun ResultSet.getZonedDateTime(columnLabel: String): ZonedDateTime {
-	return getNullableZonedDateTime(columnLabel) ?: throw IllegalStateException("Expected $columnLabel not to be null")
-}
+fun ResultSet.getZonedDateTime(columnLabel: String): ZonedDateTime =
+	getNullableZonedDateTime(columnLabel) ?: throw IllegalStateException("Expected $columnLabel not to be null")

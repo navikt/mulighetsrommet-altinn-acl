@@ -1,8 +1,8 @@
-package no.nav.amt_altinn_acl.client.altinn
+package no.nav.mulighetsrommet_altinn_acl.client.altinn
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.amt_altinn_acl.utils.JsonUtils
+import no.nav.mulighetsrommet_altinn_acl.utils.JsonUtils
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class AltinnClientImplTest {
-
 	private lateinit var mockServer: MockWebServer
 
 	@BeforeEach
@@ -24,20 +23,20 @@ class AltinnClientImplTest {
 		mockServer.shutdown()
 	}
 
-	private fun mockServerUrl(): String {
-		return mockServer.url("").toString().removeSuffix("/")
-	}
+	private fun mockServerUrl(): String = mockServer.url("").toString().removeSuffix("/")
 
 	@Test
 	fun `hentAlleOrganisasjoner - 4 tilganger - kun et kall til Altinn`() {
 		val serviceCode = "5858"
-		val altinnClient = AltinnClientImpl(
-			baseUrl = mockServerUrl(),
-			altinnApiKey = "api-key",
-			maskinportenTokenProvider = {"TOKEN"}
-		)
+		val altinnClient =
+			AltinnClientImpl(
+				baseUrl = mockServerUrl(),
+				altinnApiKey = "api-key",
+				maskinportenTokenProvider = { "TOKEN" },
+			)
 
-		val jsonResponse = """
+		val jsonResponse =
+			"""
 			[
 				{
 					"Name": "LAGSPORT PLUTSELIG ",
@@ -75,12 +74,12 @@ class AltinnClientImplTest {
 					"Status": "Active"
 				}
 			]
-		""".trimIndent()
+			""".trimIndent()
 
 		mockServer.enqueue(
 			MockResponse()
 				.setBody(jsonResponse)
-				.setHeader("Content-Type", "application/json")
+				.setHeader("Content-Type", "application/json"),
 		)
 
 		val norskIdent = "123456"
@@ -90,10 +89,10 @@ class AltinnClientImplTest {
 		val request = mockServer.takeRequest()
 
 		request.method shouldBe "GET"
-		request.path shouldBe "/api/serviceowner/reportees?subject=$norskIdent&serviceCode=$serviceCode&serviceEdition=1&\$top=$pagineringSize&\$skip=0"
+		request.path shouldBe
+			"/api/serviceowner/reportees?subject=$norskIdent&serviceCode=$serviceCode&serviceEdition=1&\$top=$pagineringSize&\$skip=0"
 		request.headers["APIKEY"] shouldBe "api-key"
 		request.headers["Authorization"] shouldBe "Bearer TOKEN"
-
 
 		organisasjoner shouldHaveSize 4
 	}
@@ -101,13 +100,15 @@ class AltinnClientImplTest {
 	@Test
 	fun `hentAlleOrganisasjoner - 505 tilganger - to kall til Altinn`() {
 		val serviceCode = "5858"
-		val altinnClient = AltinnClientImpl(
-			baseUrl = mockServerUrl(),
-			altinnApiKey = "api-key",
-			maskinportenTokenProvider = {"TOKEN"}
-		)
+		val altinnClient =
+			AltinnClientImpl(
+				baseUrl = mockServerUrl(),
+				altinnApiKey = "api-key",
+				maskinportenTokenProvider = { "TOKEN" },
+			)
 
-		val jsonResponse = """
+		val jsonResponse =
+			"""
 			[
 				{
 					"Name": "LAGSPORT PLUTSELIG ",
@@ -145,17 +146,17 @@ class AltinnClientImplTest {
 					"Status": "Active"
 				}
 			]
-		""".trimIndent()
+			""".trimIndent()
 
 		mockServer.enqueue(
 			MockResponse()
 				.setBody(JsonUtils.objectMapper.writeValueAsString(getAltinnResponse()))
-				.setHeader("Content-Type", "application/json")
+				.setHeader("Content-Type", "application/json"),
 		)
 		mockServer.enqueue(
 			MockResponse()
 				.setBody(jsonResponse)
-				.setHeader("Content-Type", "application/json")
+				.setHeader("Content-Type", "application/json"),
 		)
 
 		val norskIdent = "123456"
@@ -174,8 +175,8 @@ private fun getAltinnResponse(size: Int = 501): List<AltinnClientImpl.ReporteeRe
 		response.add(
 			AltinnClientImpl.ReporteeResponseEntity.Reportee(
 				type = "Type + $i",
-				organisasjonsnummer = i.toString()
-			)
+				organisasjonsnummer = i.toString(),
+			),
 		)
 		i++
 	}

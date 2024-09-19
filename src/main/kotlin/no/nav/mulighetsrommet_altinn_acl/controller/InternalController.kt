@@ -1,9 +1,9 @@
-package no.nav.amt_altinn_acl.controller
+package no.nav.mulighetsrommet_altinn_acl.controller
 
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.amt_altinn_acl.client.altinn.AltinnClient
-import no.nav.amt_altinn_acl.jobs.AltinnUpdater
-import no.nav.amt_altinn_acl.utils.SecureLog.secureLog
+import no.nav.mulighetsrommet_altinn_acl.client.altinn.AltinnClient
+import no.nav.mulighetsrommet_altinn_acl.jobs.AltinnUpdater
+import no.nav.mulighetsrommet_altinn_acl.utils.SecureLog.secureLog
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/internal")
 class InternalController(
 	private val altinnClient: AltinnClient,
-	private val altinnUpdater: AltinnUpdater
+	private val altinnUpdater: AltinnUpdater,
 ) {
 	@Unprotected
 	@GetMapping("/altinn/synkroniser")
-	fun synkroniserAltinnRettigheter(
-		servlet: HttpServletRequest,
-	) {
+	fun synkroniserAltinnRettigheter(servlet: HttpServletRequest) {
 		if (isInternal(servlet)) {
 			altinnUpdater.update()
 		} else {
@@ -37,7 +35,7 @@ class InternalController(
 		servlet: HttpServletRequest,
 		@RequestParam("fnr") fnr: String,
 		@RequestParam("serviceCode") serviceCode: String,
-	) : List<String> {
+	): List<String> {
 		secureLog.info("Reached /altinn/organisasjoner")
 		if (isInternal(servlet)) {
 			secureLog.info("Passed internal /altinn/organisasjoner")
@@ -47,8 +45,5 @@ class InternalController(
 		throw RuntimeException("No access")
 	}
 
-	private fun isInternal(servlet: HttpServletRequest): Boolean {
-		return servlet.remoteAddr == "127.0.0.1"
-	}
-
+	private fun isInternal(servlet: HttpServletRequest): Boolean = servlet.remoteAddr == "127.0.0.1"
 }

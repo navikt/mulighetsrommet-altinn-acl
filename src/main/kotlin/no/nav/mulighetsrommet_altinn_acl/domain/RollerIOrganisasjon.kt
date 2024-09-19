@@ -1,6 +1,6 @@
-package no.nav.amt_altinn_acl.domain
+package no.nav.mulighetsrommet_altinn_acl.domain
 
 data class RollerIOrganisasjon(
 	val organisasjonsnummer: String,
-	val roller: List<Rolle>
+	val roller: List<Rolle>,
 )

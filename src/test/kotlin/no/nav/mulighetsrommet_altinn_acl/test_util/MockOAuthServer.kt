@@ -1,11 +1,10 @@
-package no.nav.amt_altinn_acl.test_util
+package no.nav.mulighetsrommet_altinn_acl.test_util
 
-import no.nav.amt_altinn_acl.service.AuthService
+import no.nav.mulighetsrommet_altinn_acl.service.AuthService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
 
 open class MockOAuthServer {
-
 	private val azureAdIssuer = "azuread"
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -22,9 +21,7 @@ open class MockOAuthServer {
 		}
 	}
 
-	fun getDiscoveryUrl(issuer: String = azureAdIssuer): String {
-		return server.wellKnownUrl(issuer).toString()
-	}
+	fun getDiscoveryUrl(issuer: String = azureAdIssuer): String = server.wellKnownUrl(issuer).toString()
 
 	fun shutdown() {
 		server.shutdown()
@@ -33,20 +30,17 @@ open class MockOAuthServer {
 	fun issueAzureAdToken(
 		subject: String = "test",
 		audience: String = "test-aud",
-		claims: Map<String, Any> = emptyMap()
-	): String {
-		return server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
-	}
+		claims: Map<String, Any> = emptyMap(),
+	): String = server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
 
 	fun issueAzureAdM2MToken(
 		subject: String = "test",
 		audience: String = "test-aud",
-		claims: Map<String, Any> = emptyMap()
+		claims: Map<String, Any> = emptyMap(),
 	): String {
 		val claimsWithRoles = claims.toMutableMap()
 		claimsWithRoles["roles"] = arrayOf(AuthService.ACCESS_AS_APPLICATION_ROLE)
 
 		return server.issueToken(azureAdIssuer, subject, audience, claimsWithRoles).serialize()
 	}
-
 }

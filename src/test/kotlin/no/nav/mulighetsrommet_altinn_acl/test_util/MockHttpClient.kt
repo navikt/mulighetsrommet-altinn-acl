@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.test_util
+package no.nav.mulighetsrommet_altinn_acl.test_util
 
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -7,7 +7,6 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.slf4j.LoggerFactory
 
 open class MockHttpClient {
-
 	private val server = MockWebServer()
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -26,9 +25,7 @@ open class MockHttpClient {
 		lastRequestCount = server.requestCount
 	}
 
-	fun serverUrl(): String {
-		return server.url("").toString().removeSuffix("/")
-	}
+	fun serverUrl(): String = server.url("").toString().removeSuffix("/")
 
 	fun enqueue(response: MockResponse) {
 		server.enqueue(response)
@@ -37,11 +34,12 @@ open class MockHttpClient {
 	fun enqueue(
 		responseCode: Int = 200,
 		headers: Map<String, String> = emptyMap(),
-		body: String
+		body: String,
 	) {
-		val response = MockResponse()
-			.setBody(body)
-			.setResponseCode(responseCode)
+		val response =
+			MockResponse()
+				.setBody(body)
+				.setResponseCode(responseCode)
 
 		headers.forEach {
 			response.addHeader(it.key, it.value)
@@ -53,33 +51,29 @@ open class MockHttpClient {
 	fun dispatch(
 		responseCode: Int = 200,
 		headers: Map<String, String> = emptyMap(),
-		body: String
+		body: String,
 	) {
-		server.dispatcher = object : Dispatcher() {
-			override fun dispatch(request: RecordedRequest): MockResponse {
-				val response = MockResponse()
-					.setBody(body)
-					.setResponseCode(responseCode)
+		server.dispatcher =
+			object : Dispatcher() {
+				override fun dispatch(request: RecordedRequest): MockResponse {
+					val response =
+						MockResponse()
+							.setBody(body)
+							.setResponseCode(responseCode)
 
-				headers.forEach {
-					response.addHeader(it.key, it.value)
+					headers.forEach {
+						response.addHeader(it.key, it.value)
+					}
+					return response
 				}
-				return response
-
 			}
-		}
 	}
 
-	fun latestRequest(): RecordedRequest {
-		return server.takeRequest()
-	}
+	fun latestRequest(): RecordedRequest = server.takeRequest()
 
-	fun requestCount(): Int {
-		return server.requestCount - lastRequestCount
-	}
+	fun requestCount(): Int = server.requestCount - lastRequestCount
 
 	fun shutdown() {
 		server.shutdown()
 	}
-
 }

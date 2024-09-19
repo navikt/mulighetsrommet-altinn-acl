@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.utils
+package no.nav.mulighetsrommet_altinn_acl.utils
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

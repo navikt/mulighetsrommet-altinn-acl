@@ -1,6 +1,6 @@
-package no.nav.amt_altinn_acl.repository.dbo
+package no.nav.mulighetsrommet_altinn_acl.repository.dbo
 
-import no.nav.amt_altinn_acl.domain.RolleType
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
 import java.time.ZonedDateTime
 
 data class RolleDbo(
@@ -9,11 +9,7 @@ data class RolleDbo(
 	val organisasjonsnummer: String,
 	val rolleType: RolleType,
 	val validFrom: ZonedDateTime,
-	val validTo: ZonedDateTime?
+	val validTo: ZonedDateTime?,
 ) {
-
-	fun erGyldig(): Boolean {
-		return validTo == null
-	}
-
+	fun erGyldig(): Boolean = validTo == null
 }

@@ -1,12 +1,12 @@
-package no.nav.amt_altinn_acl.service
+package no.nav.mulighetsrommet_altinn_acl.service
 
-import no.nav.amt_altinn_acl.client.altinn.AltinnClient
-import no.nav.amt_altinn_acl.domain.Rolle
-import no.nav.amt_altinn_acl.domain.RolleType
-import no.nav.amt_altinn_acl.domain.RollerIOrganisasjon
-import no.nav.amt_altinn_acl.repository.PersonRepository
-import no.nav.amt_altinn_acl.repository.RolleRepository
-import no.nav.amt_altinn_acl.repository.dbo.RolleDbo
+import no.nav.mulighetsrommet_altinn_acl.client.altinn.AltinnClient
+import no.nav.mulighetsrommet_altinn_acl.domain.Rolle
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
+import no.nav.mulighetsrommet_altinn_acl.domain.RollerIOrganisasjon
+import no.nav.mulighetsrommet_altinn_acl.repository.PersonRepository
+import no.nav.mulighetsrommet_altinn_acl.repository.RolleRepository
+import no.nav.mulighetsrommet_altinn_acl.repository.dbo.RolleDbo
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -18,9 +18,8 @@ import java.time.ZonedDateTime
 class RolleService(
 	private val personRepository: PersonRepository,
 	private val rolleRepository: RolleRepository,
-	private val altinnClient: AltinnClient
+	private val altinnClient: AltinnClient,
 ) {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	fun getRollerForPerson(norskIdent: String): List<RollerIOrganisasjon> {
@@ -34,18 +33,22 @@ class RolleService(
 			updateRollerFromAltinn(person.id, norskIdent)
 			return map(getGyldigeRoller(norskIdent))
 		} else {
-			val roller = getGyldigeRoller(norskIdent).let {
-				if (it.isEmpty()) {
-					updateRollerFromAltinn(person.id, norskIdent)
-					return@let getGyldigeRoller(norskIdent)
+			val roller =
+				getGyldigeRoller(norskIdent).let {
+					if (it.isEmpty()) {
+						updateRollerFromAltinn(person.id, norskIdent)
+						return@let getGyldigeRoller(norskIdent)
+					}
+					return@let it
 				}
-				return@let it
-			}
 			return map(roller)
 		}
 	}
 
-	fun synchronizeUsers(max: Int = 25, synchronizedBefore: LocalDateTime = LocalDateTime.now().minusWeeks(1)) {
+	fun synchronizeUsers(
+		max: Int = 25,
+		synchronizedBefore: LocalDateTime = LocalDateTime.now().minusWeeks(1),
+	) {
 		val personsToSynchronize = personRepository.getUnsynchronizedPersons(max, synchronizedBefore)
 
 		log.info("Starter synkronisering av ${personsToSynchronize.size} brukere med utgått tilgang")
@@ -60,15 +63,18 @@ class RolleService(
 	private fun getAndSaveRollerFromAltinn(norskIdent: String): List<RolleDbo> {
 		val start = Instant.now()
 
-		val rolleMap: Map<RolleType, List<String>> = RolleType.values().associateWith { rolle ->
-			val organisasjonerMedRolle = try {
-				altinnClient.hentAlleOrganisasjoner(norskIdent, rolle.serviceCode)
-			} catch (e: Exception) {
-				log.warn("Klarte ikke hente rolle $rolle for ny bruker", e)
-				return@associateWith emptyList()
-			}
-			organisasjonerMedRolle
-		}.filterValues { it.isNotEmpty() }
+		val rolleMap: Map<RolleType, List<String>> =
+			RolleType.entries
+				.associateWith { rolle ->
+					val organisasjonerMedRolle =
+						try {
+							altinnClient.hentAlleOrganisasjoner(norskIdent, rolle.serviceCode)
+						} catch (e: Exception) {
+							log.warn("Klarte ikke hente rolle $rolle for ny bruker", e)
+							return@associateWith emptyList()
+						}
+					organisasjonerMedRolle
+				}.filterValues { it.isNotEmpty() }
 
 		if (rolleMap.isEmpty()) {
 			log.info("Bruker har ingen tilganger i Altinn")
@@ -88,31 +94,35 @@ class RolleService(
 		return getGyldigeRoller(norskIdent)
 	}
 
-	private fun updateRollerFromAltinn(id: Long, norskIdent: String) {
+	private fun updateRollerFromAltinn(
+		id: Long,
+		norskIdent: String,
+	) {
 		val start = Instant.now()
 
 		val allOldRoller = getGyldigeRoller(norskIdent)
 
-		RolleType.values().forEach { rolle ->
-			val organisasjonerMedRolle = try {
-				altinnClient.hentAlleOrganisasjoner(norskIdent, rolle.serviceCode)
-			} catch (e: Exception) {
-				log.warn("Klarte ikke oppdatere roller for bruker $id og roller $rolle, bruker lagrede roller om eksisterer", e)
-				return
-			}
+		RolleType.entries.forEach { rolle ->
+			val organisasjonerMedRolle =
+				try {
+					altinnClient.hentAlleOrganisasjoner(norskIdent, rolle.serviceCode)
+				} catch (e: Exception) {
+					log.warn("Klarte ikke oppdatere roller for bruker $id og roller $rolle, bruker lagrede roller om eksisterer", e)
+					return
+				}
 
 			val oldRoller = allOldRoller.filter { it.rolleType == rolle }
 
 			oldRoller.forEach { oldRolle ->
 				if (!organisasjonerMedRolle.contains(oldRolle.organisasjonsnummer)) {
-					log.debug("User $id lost $rolle on ${oldRolle.organisasjonsnummer}")
+					log.debug("User {} lost {} on {}", id, rolle, oldRolle.organisasjonsnummer)
 					rolleRepository.invalidateRolle(oldRolle.id)
 				}
 			}
 
 			organisasjonerMedRolle.forEach { orgRolle ->
 				if (oldRoller.find { it.organisasjonsnummer == orgRolle } == null) {
-					log.debug("User $id got $rolle on $orgRolle")
+					log.debug("User {} got {} on {}", id, rolle, orgRolle)
 					rolleRepository.createRolle(id, orgRolle, rolle)
 				}
 			}
@@ -124,28 +134,30 @@ class RolleService(
 	}
 
 	private fun getGyldigeRoller(norskIdent: String) =
-		rolleRepository.hentRollerForPerson(norskIdent)
+		rolleRepository
+			.hentRollerForPerson(norskIdent)
 			.filter { it.erGyldig() }
 
-
 	private fun map(roller: List<RolleDbo>): List<RollerIOrganisasjon> {
-		val rollerPerOrganisasjon = roller.associateBy(
-			{ it.organisasjonsnummer },
-			{ roller.filter { r -> r.organisasjonsnummer == it.organisasjonsnummer } })
+		val rollerPerOrganisasjon =
+			roller.associateBy(
+				{ it.organisasjonsnummer },
+				{ roller.filter { r -> r.organisasjonsnummer == it.organisasjonsnummer } },
+			)
 
 		return rollerPerOrganisasjon.map { org ->
 			RollerIOrganisasjon(
 				organisasjonsnummer = org.key,
-				roller = org.value.map { rolle ->
-					Rolle(
-						id = rolle.id,
-						rolleType = rolle.rolleType,
-						validFrom = rolle.validFrom,
-						validTo = rolle.validTo
-					)
-				}
+				roller =
+					org.value.map { rolle ->
+						Rolle(
+							id = rolle.id,
+							rolleType = rolle.rolleType,
+							validFrom = rolle.validFrom,
+							validTo = rolle.validTo,
+						)
+					},
 			)
 		}
 	}
-
 }

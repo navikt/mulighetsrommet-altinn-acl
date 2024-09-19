@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl
+package no.nav.mulighetsrommet_altinn_acl
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

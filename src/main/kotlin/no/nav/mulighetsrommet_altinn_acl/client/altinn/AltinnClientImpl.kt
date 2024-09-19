@@ -1,9 +1,9 @@
-package no.nav.amt_altinn_acl.client.altinn
+package no.nav.mulighetsrommet_altinn_acl.client.altinn
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import no.nav.amt_altinn_acl.utils.JsonUtils.fromJsonString
-import no.nav.amt_altinn_acl.utils.SecureLog.secureLog
 import no.nav.common.rest.client.RestClient
+import no.nav.mulighetsrommet_altinn_acl.utils.JsonUtils.fromJsonString
+import no.nav.mulighetsrommet_altinn_acl.utils.SecureLog.secureLog
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.slf4j.LoggerFactory
@@ -19,7 +19,10 @@ class AltinnClientImpl(
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	// TODO Bytt ut hentAlleOrganisasjoner til å hente mot authorizedParties istedenfor
-	override fun hentAlleOrganisasjoner(norskIdent: String, serviceCode: String): List<String> {
+	override fun hentAlleOrganisasjoner(
+		norskIdent: String,
+		serviceCode: String,
+	): List<String> {
 		val organisasjoner = HashSet<String>()
 		var ferdig = false
 		var i = 0
@@ -33,23 +36,33 @@ class AltinnClientImpl(
 		return organisasjoner.toList()
 	}
 
-	private fun hentAlleOrganisasjonerFraAltinn(norskIdent: String, serviceCode: String, skip: Int): List<String> {
-		val request = Request.Builder()
-			.url("$baseUrl/api/serviceowner/reportees?subject=$norskIdent&serviceCode=$serviceCode&serviceEdition=1&\$top=$pagineringSize&\$skip=$skip")
-			.addHeader("APIKEY", altinnApiKey)
-			.addHeader("Authorization", "Bearer ${maskinportenTokenProvider.invoke()}")
-			.get()
-			.build()
+	private fun hentAlleOrganisasjonerFraAltinn(
+		norskIdent: String,
+		serviceCode: String,
+		skip: Int,
+	): List<String> {
+		val request =
+			Request
+				.Builder()
+				.url(
+					"$baseUrl/api/serviceowner/reportees?subject=$norskIdent&serviceCode=$serviceCode&serviceEdition=1&\$top=$pagineringSize&\$skip=$skip",
+				).addHeader("APIKEY", altinnApiKey)
+				.addHeader("Authorization", "Bearer ${maskinportenTokenProvider.invoke()}")
+				.get()
+				.build()
 
 		client.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
-				secureLog.error("Klarte ikke å hente organisasjoner for serviceCode=$serviceCode norskIdent=$norskIdent message=${response.message}, code=${response.code}, body=${response.body?.string()}")
+				secureLog.error(
+					"Klarte ikke å hente organisasjoner for serviceCode=$serviceCode norskIdent=$norskIdent message=${response.message}, code=${response.code}, body=${response.body?.string()}",
+				)
 				log.error("Klarte ikke hente organisasjoner for $serviceCode. response: ${response.code}")
 				throw RuntimeException("Klarte ikke å hente organisasjoner code=${response.code}")
 			}
 
-			val body = response.body?.string()
-				?: throw RuntimeException("Body is missing")
+			val body =
+				response.body?.string()
+					?: throw RuntimeException("Body is missing")
 
 			if (!response.headers["X-Warning-LimitReached"].isNullOrEmpty()) {
 				secureLog.warn("Bruker med norskIdent=$norskIdent har for mange tilganger for $serviceCode, kunne ikke hente alle")
@@ -65,7 +78,6 @@ class AltinnClientImpl(
 		data class Reportee(
 			@JsonAlias("Type")
 			val type: String,
-
 			@JsonAlias("OrganizationNumber")
 			val organisasjonsnummer: String?,
 		)

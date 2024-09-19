@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.test_util
+package no.nav.mulighetsrommet_altinn_acl.test_util
 
 import io.kotest.matchers.date.shouldBeWithin
 import io.kotest.matchers.shouldNotBe
@@ -9,7 +9,6 @@ import java.time.ZonedDateTime
 import javax.sql.DataSource
 
 object DbTestDataUtils {
-
 	private const val SCHEMA = "public"
 
 	private const val FLYWAY_SCHEMA_HISTORY_TABLE_NAME = "flyway_schema_history"
@@ -19,12 +18,18 @@ object DbTestDataUtils {
 		expected!!.shouldBeWithin(Duration.ofSeconds(1), this)
 	}
 
-	fun runScript(dataSource: DataSource, script: String) {
+	fun runScript(
+		dataSource: DataSource,
+		script: String,
+	) {
 		val jdbcTemplate = JdbcTemplate(dataSource)
 		jdbcTemplate.update(script)
 	}
 
-	fun runScriptFile(dataSource: DataSource, scriptFilePath: String) {
+	fun runScriptFile(
+		dataSource: DataSource,
+		scriptFilePath: String,
+	) {
 		val script = javaClass.getResource(scriptFilePath).readText()
 		runScript(dataSource, script)
 	}
@@ -44,20 +49,23 @@ object DbTestDataUtils {
 		}
 	}
 
-	fun <V> parameters(vararg pairs: Pair<String, V>): MapSqlParameterSource {
-		return MapSqlParameterSource().addValues(pairs.toMap())
-	}
+	fun <V> parameters(vararg pairs: Pair<String, V>): MapSqlParameterSource = MapSqlParameterSource().addValues(pairs.toMap())
 
-	private fun getAllTables(jdbcTemplate: JdbcTemplate, schema: String): List<String> {
+	private fun getAllTables(
+		jdbcTemplate: JdbcTemplate,
+		schema: String,
+	): List<String> {
 		val sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = ?"
 
 		return jdbcTemplate.query(sql, { rs, _ -> rs.getString(1) }, schema)
 	}
 
-	private fun getAllSequences(jdbcTemplate: JdbcTemplate, schema: String): List<String> {
+	private fun getAllSequences(
+		jdbcTemplate: JdbcTemplate,
+		schema: String,
+	): List<String> {
 		val sql = "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = ?"
 
 		return jdbcTemplate.query(sql, { rs, _ -> rs.getString(1) }, schema)
 	}
-
 }

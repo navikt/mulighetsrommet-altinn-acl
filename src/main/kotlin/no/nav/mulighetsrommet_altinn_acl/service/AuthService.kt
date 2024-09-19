@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.service
+package no.nav.mulighetsrommet_altinn_acl.service
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpStatus
@@ -7,9 +7,8 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 class AuthService(
-	private val tokenValidationContextHolder: TokenValidationContextHolder
+	private val tokenValidationContextHolder: TokenValidationContextHolder,
 ) {
-
 	companion object {
 		const val ACCESS_AS_APPLICATION_ROLE = "access_as_application"
 	}
@@ -21,12 +20,12 @@ class AuthService(
 	}
 
 	private fun isRequestFromMachine(): Boolean {
-		val roles = tokenValidationContextHolder
-			.getTokenValidationContext()
-			.anyValidClaims
-			?.getAsList("roles") ?: emptyList()
+		val roles =
+			tokenValidationContextHolder
+				.getTokenValidationContext()
+				.anyValidClaims
+				?.getAsList("roles") ?: emptyList()
 
 		return roles.contains(ACCESS_AS_APPLICATION_ROLE)
 	}
-
 }

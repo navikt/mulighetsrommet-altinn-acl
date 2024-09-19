@@ -1,19 +1,18 @@
-package no.nav.amt_altinn_acl
+package no.nav.mulighetsrommet_altinn_acl
 
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.amt_altinn_acl.client.altinn.AltinnClient
-import no.nav.amt_altinn_acl.domain.RolleType
-import no.nav.amt_altinn_acl.domain.RolleType.KOORDINATOR
-import no.nav.amt_altinn_acl.domain.RolleType.VEILEDER
-import no.nav.amt_altinn_acl.domain.RollerIOrganisasjon
-import no.nav.amt_altinn_acl.jobs.AltinnUpdater
-import no.nav.amt_altinn_acl.jobs.leaderelection.LeaderElection
-import no.nav.amt_altinn_acl.repository.PersonRepository
-import no.nav.amt_altinn_acl.repository.RolleRepository
-import no.nav.amt_altinn_acl.service.RolleService
-import no.nav.amt_altinn_acl.test_util.SingletonPostgresContainer
+import no.nav.mulighetsrommet_altinn_acl.client.altinn.AltinnClient
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType.KOORDINATOR
+import no.nav.mulighetsrommet_altinn_acl.domain.RollerIOrganisasjon
+import no.nav.mulighetsrommet_altinn_acl.jobs.AltinnUpdater
+import no.nav.mulighetsrommet_altinn_acl.jobs.leaderelection.LeaderElection
+import no.nav.mulighetsrommet_altinn_acl.repository.PersonRepository
+import no.nav.mulighetsrommet_altinn_acl.repository.RolleRepository
+import no.nav.mulighetsrommet_altinn_acl.service.RolleService
+import no.nav.mulighetsrommet_altinn_acl.test_util.SingletonPostgresContainer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -56,22 +55,19 @@ class AltinnUpdaterTests {
 			altinnClient.hentAlleOrganisasjoner(personligIdent, KOORDINATOR.serviceCode)
 		} returns listOf(organisasjonsnummer)
 
-
-		every {
-			altinnClient.hentAlleOrganisasjoner(personligIdent, VEILEDER.serviceCode)
-		} returns emptyList()
-
 		altinnUpdater.update()
 
 		val oppdaterteRettigheter = rolleService.getRollerForPerson(personligIdent)
 		hasRolle(oppdaterteRettigheter, organisasjonsnummer, KOORDINATOR) shouldBe true
 	}
 
-	private fun hasRolle(list: List<RollerIOrganisasjon>, organizationNumber: String, rolle: RolleType): Boolean {
-		return list.find { it.organisasjonsnummer == organizationNumber }
-			?.roller?.find { it.rolleType == rolle } != null
-	}
-
-
-
+	private fun hasRolle(
+		list: List<RollerIOrganisasjon>,
+		organizationNumber: String,
+		rolle: RolleType,
+	): Boolean =
+		list
+			.find { it.organisasjonsnummer == organizationNumber }
+			?.roller
+			?.find { it.rolleType == rolle } != null
 }

@@ -1,9 +1,9 @@
-package no.nav.amt_altinn_acl.client.maskinporten
+package no.nav.mulighetsrommet_altinn_acl.client.maskinporten
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt_altinn_acl.test_util.Constants.TEST_JWK
-import no.nav.amt_altinn_acl.test_util.TokenCreator
+import no.nav.mulighetsrommet_altinn_acl.test_util.Constants.TEST_JWK
+import no.nav.mulighetsrommet_altinn_acl.test_util.TokenCreator
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 class MaskinportenClientImplTest {
-
 	private lateinit var mockServer: MockWebServer
 
 	@BeforeEach
@@ -28,9 +27,7 @@ class MaskinportenClientImplTest {
 		mockServer.shutdown()
 	}
 
-	private fun mockServerUrl(): String {
-		return mockServer.url("").toString().removeSuffix("/")
-	}
+	private fun mockServerUrl(): String = mockServer.url("").toString().removeSuffix("/")
 
 	@Test
 	fun `skal lage riktig request og parse response`() {
@@ -41,14 +38,15 @@ class MaskinportenClientImplTest {
 		val scope1 = "scope1"
 		val scope2 = "scope2"
 
-		val client = MaskinportenClientImpl(
-			clientId = "client-id",
-			issuer = "issuer",
-			altinnUrl = "https://tt02.altinn.no",
-			scopes = listOf(scope1, scope2),
-			tokenEndpointUrl = mockServerUrl() + "/token",
-			privateJwk = TEST_JWK
-		)
+		val client =
+			MaskinportenClientImpl(
+				clientId = "client-id",
+				issuer = "issuer",
+				altinnUrl = "https://tt02.altinn.no",
+				scopes = listOf(scope1, scope2),
+				tokenEndpointUrl = mockServerUrl() + "/token",
+				privateJwk = TEST_JWK,
+			)
 
 		val token = client.hentAltinnToken()
 		val recordedRequest = mockServer.takeRequest()
@@ -75,13 +73,13 @@ class MaskinportenClientImplTest {
 	}
 
 	private fun tokenMockResponse(accessToken: String): MockResponse {
-		val body = """
+		val body =
+			"""
 			{ "token_type": "Bearer", "access_token": "$accessToken", "expires": 3600 }
-		""".trimIndent()
+			""".trimIndent()
 
 		return MockResponse()
 			.setBody(body)
 			.setHeader("Content-Type", "application/json")
 	}
-
 }

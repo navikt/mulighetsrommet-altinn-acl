@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.client.maskinporten
+package no.nav.mulighetsrommet_altinn_acl.client.maskinporten
 
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.JWSSigner
@@ -23,7 +23,6 @@ class MaskinportenClientImpl(
 	tokenEndpointUrl: String,
 	privateJwk: String,
 ) : MaskinportenClient {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	private val tokenEndpoint: URI
@@ -41,22 +40,24 @@ class MaskinportenClientImpl(
 	}
 
 	override fun hentAltinnToken(): String {
-		val signedJwt = signedClientAssertion(
-			clientAssertionHeader(privateJwkKeyId),
-			clientAssertionClaims(
-				clientId,
-				issuer,
-				altinnUrl,
-				scopes
-			),
-			assertionSigner
-		)
+		val signedJwt =
+			signedClientAssertion(
+				clientAssertionHeader(privateJwkKeyId),
+				clientAssertionClaims(
+					clientId,
+					issuer,
+					altinnUrl,
+					scopes,
+				),
+				assertionSigner,
+			)
 
-		val request = TokenRequest(
-			tokenEndpoint,
-			JWTBearerGrant(signedJwt),
-			Scope(*scopes.toTypedArray()),
-		)
+		val request =
+			TokenRequest(
+				tokenEndpoint,
+				JWTBearerGrant(signedJwt),
+				Scope(*scopes.toTypedArray()),
+			)
 
 		val response = TokenResponse.parse(request.toHTTPRequest().send())
 
@@ -78,7 +79,7 @@ class MaskinportenClientImpl(
 	private fun signedClientAssertion(
 		assertionHeader: JWSHeader,
 		assertionClaims: JWTClaimsSet,
-		signer: JWSSigner
+		signer: JWSSigner,
 	): SignedJWT {
 		val signedJWT = SignedJWT(assertionHeader, assertionClaims)
 		signedJWT.sign(signer)
@@ -97,12 +98,13 @@ class MaskinportenClientImpl(
 		clientId: String,
 		issuer: String,
 		altinnUrl: String,
-		scopes: List<String>
+		scopes: List<String>,
 	): JWTClaimsSet {
 		val now = Instant.now()
 		val expire = now.plusSeconds(30)
 
-		return JWTClaimsSet.Builder()
+		return JWTClaimsSet
+			.Builder()
 			.subject(clientId)
 			.audience(issuer)
 			.issuer(clientId)
@@ -114,5 +116,4 @@ class MaskinportenClientImpl(
 			.jwtID(UUID.randomUUID().toString())
 			.build()
 	}
-
 }

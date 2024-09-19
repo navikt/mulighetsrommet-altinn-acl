@@ -1,14 +1,13 @@
-package no.nav.amt_altinn_acl.service
+package no.nav.mulighetsrommet_altinn_acl.service
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt_altinn_acl.domain.RolleType
-import no.nav.amt_altinn_acl.domain.RolleType.KOORDINATOR
-import no.nav.amt_altinn_acl.domain.RolleType.VEILEDER
-import no.nav.amt_altinn_acl.domain.RollerIOrganisasjon
-import no.nav.amt_altinn_acl.repository.PersonRepository
-import no.nav.amt_altinn_acl.repository.RolleRepository
-import no.nav.amt_altinn_acl.test_util.IntegrationTest
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType.KOORDINATOR
+import no.nav.mulighetsrommet_altinn_acl.domain.RollerIOrganisasjon
+import no.nav.mulighetsrommet_altinn_acl.repository.PersonRepository
+import no.nav.mulighetsrommet_altinn_acl.repository.RolleRepository
+import no.nav.mulighetsrommet_altinn_acl.test_util.IntegrationTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +16,6 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 class RolleServiceTest : IntegrationTest() {
-
 	@Autowired
 	lateinit var rolleService: RolleService
 
@@ -38,22 +36,19 @@ class RolleServiceTest : IntegrationTest() {
 		val norskIdent = UUID.randomUUID().toString()
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, listOf(organisasjonsnummer))
 		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		mockAltinnHttpClient.requestCount() shouldBe 2
+		mockAltinnHttpClient.requestCount() shouldBe 1
 
 		roller.size shouldBe 1
 
-		hasRolle(roller, organisasjonsnummer, VEILEDER) shouldBe true
 		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
 
 		val databasePerson = personRepository.get(norskIdent)!!
 		databasePerson.lastSynchronized.days() shouldBe ZonedDateTime.now().days()
 
-		hasRolleInDatabase(databasePerson.id, organisasjonsnummer, VEILEDER) shouldBe true
 		hasRolleInDatabase(databasePerson.id, organisasjonsnummer, KOORDINATOR) shouldBe true
 	}
 
@@ -61,12 +56,11 @@ class RolleServiceTest : IntegrationTest() {
 	internal fun `getRollerForPerson - not exist and no roller in Altinn - don't save person`() {
 		val norskIdent = UUID.randomUUID().toString()
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, emptyList())
 		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, emptyList())
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		mockAltinnHttpClient.requestCount() shouldBe 2
+		mockAltinnHttpClient.requestCount() shouldBe 1
 		roller.size shouldBe 0
 		personRepository.get(norskIdent) shouldBe null
 	}
@@ -82,7 +76,7 @@ class RolleServiceTest : IntegrationTest() {
 		rolleRepository.createRolle(
 			personId = personDbo.id,
 			organisasjonsnummer = organisasjonsnummer,
-			rolleType = KOORDINATOR
+			rolleType = KOORDINATOR,
 		)
 
 		rolleService.getRollerForPerson(norskIdent)
@@ -97,37 +91,32 @@ class RolleServiceTest : IntegrationTest() {
 		personRepository.create(norskIdent)
 		personRepository.setSynchronized(norskIdent)
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, listOf(organisasjonsnummer))
 		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(roller, organisasjonsnummer, VEILEDER) shouldBe true
 		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
 
-		mockAltinnHttpClient.requestCount() shouldBe 2
+		mockAltinnHttpClient.requestCount() shouldBe 1
 	}
 
 	@Test
-	internal fun `getRollerForPerson - exists - has lost roller in altinn`() {
+	internal fun `getRollerForPerson - exists - has lost rolle in altinn`() {
 		val norskIdent = UUID.randomUUID().toString()
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
 		val personDbo = personRepository.create(norskIdent)
 		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
-		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, VEILEDER)
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, listOf())
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf())
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(roller, organisasjonsnummer, VEILEDER) shouldBe false
-		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe false
 
-		val invalidVeileder = rolleRepository.hentRollerForPerson(personDbo.id).find { it.rolleType == VEILEDER }!!
+		val invalidKoordinator = rolleRepository.hentRollerForPerson(personDbo.id).find { it.rolleType == KOORDINATOR }!!
 
-		invalidVeileder.validTo shouldNotBe null
+		invalidKoordinator.validTo shouldNotBe null
 	}
 
 	@Test
@@ -136,14 +125,12 @@ class RolleServiceTest : IntegrationTest() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
 		val personDbo = personRepository.create(norskIdent)
-		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, VEILEDER)
+		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
 
 		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, listOf(organisasjonsnummer))
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(roller, organisasjonsnummer, VEILEDER) shouldBe true
 		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
 	}
 
@@ -156,7 +143,6 @@ class RolleServiceTest : IntegrationTest() {
 		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
 
 		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf())
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, listOf())
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
@@ -164,17 +150,17 @@ class RolleServiceTest : IntegrationTest() {
 
 		mockAltinnHttpClient.resetHttpServer()
 		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, VEILEDER.serviceCode, listOf())
 
 		val updatedRoller = rolleService.getRollerForPerson(norskIdent)
 
 		hasRolle(updatedRoller, organisasjonsnummer, KOORDINATOR) shouldBe true
 
-		val databaseRoller = rolleRepository.hentRollerForPerson(personDbo.id)
-			.filter { it.rolleType == KOORDINATOR }
+		val databaseRoller =
+			rolleRepository
+				.hentRollerForPerson(personDbo.id)
+				.filter { it.rolleType == KOORDINATOR }
 
 		databaseRoller.size shouldBe 2
-
 	}
 
 	@Test
@@ -186,7 +172,6 @@ class RolleServiceTest : IntegrationTest() {
 		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
 
 		mockAltinnHttpClient.addFailureResponse(norskIdent, KOORDINATOR.serviceCode, 500)
-		mockAltinnHttpClient.addFailureResponse(norskIdent, VEILEDER.serviceCode, 500)
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
@@ -198,18 +183,25 @@ class RolleServiceTest : IntegrationTest() {
 		updatedPersonDbo!!.lastSynchronized.days() shouldNotBe ZonedDateTime.now().days()
 	}
 
-	private fun hasRolleInDatabase(personId: Long, organisasjonsnummerNumber: String, rolle: RolleType): Boolean {
-		return rolleRepository.hentRollerForPerson(personId)
+	private fun hasRolleInDatabase(
+		personId: Long,
+		organisasjonsnummerNumber: String,
+		rolle: RolleType,
+	): Boolean =
+		rolleRepository
+			.hentRollerForPerson(personId)
 			.filter { it.erGyldig() }
 			.find { it.organisasjonsnummer == organisasjonsnummerNumber && it.rolleType == rolle } != null
-	}
 
-	private fun hasRolle(list: List<RollerIOrganisasjon>, organisasjonsnummerNumber: String, rolle: RolleType): Boolean {
-		return list.find { it.organisasjonsnummer == organisasjonsnummerNumber }
-			?.roller?.find { it.rolleType == rolle } != null
-	}
+	private fun hasRolle(
+		list: List<RollerIOrganisasjon>,
+		organisasjonsnummerNumber: String,
+		rolle: RolleType,
+	): Boolean =
+		list
+			.find { it.organisasjonsnummer == organisasjonsnummerNumber }
+			?.roller
+			?.find { it.rolleType == rolle } != null
 
-	private fun ZonedDateTime.days(): ZonedDateTime {
-		return this.truncatedTo(ChronoUnit.DAYS)
-	}
+	private fun ZonedDateTime.days(): ZonedDateTime = this.truncatedTo(ChronoUnit.DAYS)
 }

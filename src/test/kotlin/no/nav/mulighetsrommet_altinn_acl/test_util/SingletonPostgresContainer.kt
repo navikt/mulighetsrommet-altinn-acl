@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.test_util
+package no.nav.mulighetsrommet_altinn_acl.test_util
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -10,7 +10,6 @@ import org.testcontainers.utility.DockerImageName
 import javax.sql.DataSource
 
 object SingletonPostgresContainer {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	private const val postgresDockerImageName = "postgres:14-alpine"
@@ -46,20 +45,21 @@ object SingletonPostgresContainer {
 	}
 
 	private fun applyMigrations(dataSource: DataSource) {
-		val flyway: Flyway = Flyway.configure()
-			.dataSource(dataSource)
-			.connectRetries(10)
-			.cleanDisabled(false)
-			.load()
+		val flyway: Flyway =
+			Flyway
+				.configure()
+				.dataSource(dataSource)
+				.connectRetries(10)
+				.cleanDisabled(false)
+				.load()
 
 		flyway.clean()
 		flyway.migrate()
 	}
 
-	private fun createContainer(): PostgreSQLContainer<Nothing> {
-		return PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName))
+	private fun createContainer(): PostgreSQLContainer<Nothing> =
+		PostgreSQLContainer<Nothing>(DockerImageName.parse(postgresDockerImageName))
 			.waitingFor(HostPortWaitStrategy())
-	}
 
 	private fun createDataSource(container: PostgreSQLContainer<Nothing>): DataSource {
 		val config = HikariConfig()
@@ -74,10 +74,11 @@ object SingletonPostgresContainer {
 	}
 
 	private fun setupShutdownHook() {
-		Runtime.getRuntime().addShutdownHook(Thread {
-			log.info("Shutting down postgres database...")
-			postgresContainer?.stop()
-		})
+		Runtime.getRuntime().addShutdownHook(
+			Thread {
+				log.info("Shutting down postgres database...")
+				postgresContainer?.stop()
+			},
+		)
 	}
-
 }

@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.config
+package no.nav.mulighetsrommet_altinn_acl.config
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.slf4j.LoggerFactory
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @ControllerAdvice
 class ExceptionHandler {
-
 	private val log = LoggerFactory.getLogger(javaClass)
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
@@ -26,7 +25,7 @@ class ExceptionHandler {
 					status = status.value(),
 					title = status,
 					detail = e.message,
-				)
+				),
 			)
 	}
 
@@ -43,7 +42,7 @@ class ExceptionHandler {
 					status = status.value(),
 					title = status,
 					detail = e.message,
-				)
+				),
 			)
 	}
 

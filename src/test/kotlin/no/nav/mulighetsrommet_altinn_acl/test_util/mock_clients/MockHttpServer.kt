@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.test_util.mock_clients
+package no.nav.mulighetsrommet_altinn_acl.test_util.mock_clients
 
 import okhttp3.Headers
 import okhttp3.ResponseBody.Companion.asResponseBody
@@ -10,9 +10,8 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 abstract class MockHttpServer(
-	private val name: String
+	private val name: String,
 ) {
-
 	private val server = MockWebServer()
 
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -25,23 +24,23 @@ abstract class MockHttpServer(
 		try {
 			server.start()
 
-			server.dispatcher = object : Dispatcher() {
-				override fun dispatch(request: RecordedRequest): MockResponse {
-					val response = responses.entries.find { it.key.invoke(request) }?.value
-						?: throw IllegalStateException(
-							"$name: Mock has no handler for $request\n" +
-								"	Headers: \n${printHeaders(request.headers)}\n" +
-								"	Body: ${request.body.readUtf8()}"
-						)
+			server.dispatcher =
+				object : Dispatcher() {
+					override fun dispatch(request: RecordedRequest): MockResponse {
+						val response =
+							responses.entries.find { it.key.invoke(request) }?.value
+								?: throw IllegalStateException(
+									"$name: Mock has no handler for $request\n" +
+										"	Headers: \n${printHeaders(request.headers)}\n" +
+										"	Body: ${request.body.readUtf8()}",
+								)
 
-					response.count = response.count + 1
+						response.count = response.count + 1
 
-					log.info("Responding [${request.method}: ${request.path}]: ${response.toString(request)}")
-					return response.response.invoke(request)
+						log.info("Responding [${request.method}: ${request.path}]: ${response.toString(request)}")
+						return response.response.invoke(request)
+					}
 				}
-
-			}
-
 		} catch (e: IllegalArgumentException) {
 			log.info("${javaClass.simpleName} is already started")
 		}
@@ -49,14 +48,17 @@ abstract class MockHttpServer(
 
 	protected fun addResponseHandler(
 		predicate: (req: RecordedRequest) -> Boolean,
-		response: (req: RecordedRequest) -> MockResponse
+		response: (req: RecordedRequest) -> MockResponse,
 	): UUID {
 		val id = UUID.randomUUID()
 		responses[predicate] = ResponseHolder(id, response)
 		return id
 	}
 
-	protected fun addResponseHandler(path: String, response: MockResponse): UUID {
+	protected fun addResponseHandler(
+		path: String,
+		response: MockResponse,
+	): UUID {
 		val predicate = { req: RecordedRequest -> req.path == path }
 		return addResponseHandler(predicate) { response }
 	}
@@ -66,40 +68,36 @@ abstract class MockHttpServer(
 		lastRequestCount = server.requestCount
 	}
 
-	fun serverUrl(): String {
-		return server.url("").toString().removeSuffix("/")
-	}
+	fun serverUrl(): String = server.url("").toString().removeSuffix("/")
 
-	fun requestCount(): Int {
-		return server.requestCount - lastRequestCount
-	}
+	fun requestCount(): Int = server.requestCount - lastRequestCount
 
-	private fun printHeaders(headers: Headers): String {
-		return headers.map { "		${it.first} : ${it.second}" }
+	private fun printHeaders(headers: Headers): String =
+		headers
+			.map { "		${it.first} : ${it.second}" }
 			.joinToString("\n")
-	}
 
 	private data class ResponseHolder(
 		val id: UUID,
 		val response: (request: RecordedRequest) -> MockResponse,
-		var count: Int = 0
+		var count: Int = 0,
 	) {
 		fun toString(request: RecordedRequest): String {
 			val invokedResponse = response.invoke(request)
 
-			val responseBody = invokedResponse.getBody()?.let { buffer ->
-				buffer.copy()
-					.asResponseBody()
-					.string()
-					.replace("\n", "")
-					.replace("  ", "")
-					.replace("	", "")
-					.trim()
-
-			}
+			val responseBody =
+				invokedResponse.getBody()?.let { buffer ->
+					buffer
+						.copy()
+						.asResponseBody()
+						.string()
+						.replace("\n", "")
+						.replace("  ", "")
+						.replace("	", "")
+						.trim()
+				}
 
 			return "$id: count=$count status=${invokedResponse.status} body=$responseBody"
 		}
-
 	}
 }

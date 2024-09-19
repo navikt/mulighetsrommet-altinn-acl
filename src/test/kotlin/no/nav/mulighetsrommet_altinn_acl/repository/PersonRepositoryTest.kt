@@ -1,9 +1,9 @@
-package no.nav.amt_altinn_acl.repository
+package no.nav.mulighetsrommet_altinn_acl.repository
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.amt_altinn_acl.test_util.DbTestDataUtils
-import no.nav.amt_altinn_acl.test_util.SingletonPostgresContainer
+import no.nav.mulighetsrommet_altinn_acl.test_util.DbTestDataUtils
+import no.nav.mulighetsrommet_altinn_acl.test_util.SingletonPostgresContainer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -13,7 +13,6 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 class PersonRepositoryTest {
-
 	private val dataSource = SingletonPostgresContainer.getDataSource()
 	private val repository = PersonRepository(NamedParameterJdbcTemplate(dataSource))
 

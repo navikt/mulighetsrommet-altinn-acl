@@ -1,7 +1,7 @@
-package no.nav.amt_altinn_acl.jobs.leaderelection
+package no.nav.mulighetsrommet_altinn_acl.jobs.leaderelection
 
-import no.nav.amt_altinn_acl.utils.JsonUtils.fromJsonString
 import no.nav.common.rest.client.RestClient
+import no.nav.mulighetsrommet_altinn_acl.utils.JsonUtils.fromJsonString
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.slf4j.LoggerFactory
@@ -12,7 +12,7 @@ import java.net.InetAddress
 
 @Component
 class LeaderElection(
-	@Value("\${elector.path}") private val electorPath: String
+	@Value("\${elector.path}") private val electorPath: String,
 ) {
 	private val client: OkHttpClient = RestClient.baseClient()
 	private val log = LoggerFactory.getLogger(javaClass)
@@ -28,12 +28,16 @@ class LeaderElection(
 	private fun kallElector(): Boolean {
 		val hostname: String = InetAddress.getLocalHost().hostName
 
-		val uriString = UriComponentsBuilder.fromHttpUrl(getHttpPath(electorPath))
-			.toUriString()
-		val request = Request.Builder()
-			.url(uriString)
-			.get()
-			.build()
+		val uriString =
+			UriComponentsBuilder
+				.fromHttpUrl(getHttpPath(electorPath))
+				.toUriString()
+		val request =
+			Request
+				.Builder()
+				.url(uriString)
+				.get()
+				.build()
 
 		client.newCall(request).execute().use { response ->
 			if (!response.isSuccessful) {
@@ -58,5 +62,8 @@ class LeaderElection(
 			true -> url
 			else -> "http://$url"
 		}
-	private data class Leader(val name: String)
+
+	private data class Leader(
+		val name: String,
+	)
 }

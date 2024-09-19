@@ -1,4 +1,4 @@
-package no.nav.amt_altinn_acl.config
+package no.nav.mulighetsrommet_altinn_acl.config
 
 import no.nav.common.rest.filter.LogRequestFilter
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 @EnableJwtTokenValidation
 class ApplicationConfig {
-
 	@Bean
 	fun logFilterRegistrationBean(): FilterRegistrationBean<LogRequestFilter> {
 		val registration = FilterRegistrationBean<LogRequestFilter>()
@@ -20,5 +19,4 @@ class ApplicationConfig {
 		registration.addUrlPatterns("/*")
 		return registration
 	}
-
 }

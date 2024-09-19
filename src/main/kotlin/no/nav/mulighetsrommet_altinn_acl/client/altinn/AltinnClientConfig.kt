@@ -1,13 +1,12 @@
-package no.nav.amt_altinn_acl.client.altinn
+package no.nav.mulighetsrommet_altinn_acl.client.altinn
 
-import no.nav.amt_altinn_acl.client.maskinporten.MaskinportenClient
+import no.nav.mulighetsrommet_altinn_acl.client.maskinporten.MaskinportenClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class AltinnClientConfig {
-
 	@Value("\${altinn.url}")
 	lateinit var altinnUrl: String
 
@@ -15,12 +14,10 @@ class AltinnClientConfig {
 	lateinit var altinnApiKey: String
 
 	@Bean
-	fun altinnClient(maskinportenClient: MaskinportenClient): AltinnClient {
-		return AltinnClientImpl(
+	fun altinnClient(maskinportenClient: MaskinportenClient): AltinnClient =
+		AltinnClientImpl(
 			baseUrl = altinnUrl,
 			altinnApiKey = altinnApiKey,
-			maskinportenTokenProvider = maskinportenClient::hentAltinnToken
+			maskinportenTokenProvider = maskinportenClient::hentAltinnToken,
 		)
-	}
-
 }
