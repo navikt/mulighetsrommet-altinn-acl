@@ -9,7 +9,7 @@ plugins {
     kotlin("plugin.spring") version kotlinVersion
 }
 
-group = "no.nav.amt-altinn-acl"
+group = "no.nav.mulighetsrommet-altinn-acl"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_21
 

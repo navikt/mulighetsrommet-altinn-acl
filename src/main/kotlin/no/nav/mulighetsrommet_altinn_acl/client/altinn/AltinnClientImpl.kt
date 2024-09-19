@@ -18,6 +18,7 @@ class AltinnClientImpl(
 ) : AltinnClient {
 	private val log = LoggerFactory.getLogger(javaClass)
 
+	// TODO Bytt ut hentAlleOrganisasjoner til å hente mot authorizedParties istedenfor
 	override fun hentAlleOrganisasjoner(norskIdent: String, serviceCode: String): List<String> {
 		val organisasjoner = HashSet<String>()
 		var ferdig = false

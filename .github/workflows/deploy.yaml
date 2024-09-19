@@ -1,6 +1,6 @@
 name: Deploy application
 on:
-  workflow_dispatch: # This workflow can be triggered manually from: https://github.com/navikt/amt-altinn-acl/actions/workflows/deploy.yaml
+  workflow_dispatch: # This workflow can be triggered manually from: https://github.com/navikt/mulighetsrommet-altinn-acl/actions/workflows/deploy.yaml
   push:
     branches:
       - main

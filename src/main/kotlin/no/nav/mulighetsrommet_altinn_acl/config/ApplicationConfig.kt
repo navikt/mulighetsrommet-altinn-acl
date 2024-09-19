@@ -15,7 +15,7 @@ class ApplicationConfig {
 	@Bean
 	fun logFilterRegistrationBean(): FilterRegistrationBean<LogRequestFilter> {
 		val registration = FilterRegistrationBean<LogRequestFilter>()
-		registration.filter = LogRequestFilter("amt-altinn-acl", false)
+		registration.filter = LogRequestFilter("mulighetsrommet-altinn-acl", false)
 		registration.order = 1
 		registration.addUrlPatterns("/*")
 		return registration
