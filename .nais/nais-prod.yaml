@@ -64,7 +64,6 @@ spec:
       value: https://www.altinn.no
   envFrom:
     - secret: altinn-api-key
-    - secret: maskinporten
   maskinporten:
     enabled: true
     scopes:

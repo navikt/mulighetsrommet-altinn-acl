@@ -42,7 +42,6 @@ spec:
       value: https://tt02.altinn.no
   envFrom:
     - secret: altinn-api-key
-    - secret: maskinporten
   azure:
     application:
       enabled: true
