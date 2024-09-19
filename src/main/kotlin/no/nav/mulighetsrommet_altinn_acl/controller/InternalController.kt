@@ -34,12 +34,11 @@ class InternalController(
 	fun hentOrganisasjoner(
 		servlet: HttpServletRequest,
 		@RequestParam("fnr") fnr: String,
-		@RequestParam("serviceCode") serviceCode: String,
 	): List<String> {
 		secureLog.info("Reached /altinn/organisasjoner")
 		if (isInternal(servlet)) {
 			secureLog.info("Passed internal /altinn/organisasjoner")
-			return altinnClient.hentAlleOrganisasjoner(fnr, serviceCode)
+			return altinnClient.hentAlleOrganisasjoner(fnr)
 		}
 		secureLog.error("Attempted external access to /altinn/organisasjoner")
 		throw RuntimeException("No access")

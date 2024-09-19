@@ -38,16 +38,11 @@ spec:
       memory: 512Mi
   leaderElection: true
   env:
-    - name: ALTINN_KOORDINATOR_SERVICE_CODE # TODO Fjerne dette til fordel for ressursId
-      value: "5858"
-    - name: ALTINN_VEILEDER_SERVICE_CODE # TODO Fjerne denne helt
-      value: "5859"
     - name: ALTINN_URL
       value: https://tt02.altinn.no
-    - name: MASKINPORTEN_URL
-      value: https://test.maskinporten.no
   envFrom:
-    - secret: altinn-api-key # TODO Opprette korrekt secret i secret-manager
+    - secret: altinn-api-key
+    - secret: maskinporten
   azure:
     application:
       enabled: true
@@ -60,6 +55,7 @@ spec:
     outbound:
       external:
         - host: tt02.altinn.no
+        - host: test.maskinporten.no
   gcp:
     sqlInstances:
       - name: mulighetsrommet-altinn-acl

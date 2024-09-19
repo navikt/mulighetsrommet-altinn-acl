@@ -38,9 +38,6 @@ class IntegrationTest {
 	}
 
 	companion object {
-		const val altinnKoordinatorServiceKode = "99999"
-		const val altinnVeilederServiceKode = "88888"
-
 		val oAuthServer = MockOAuthServer()
 		val mockAltinnHttpClient = MockAltinnHttpServer()
 		val mockMaskinportenHttpClient = MockMaskinportenHttpClient()
@@ -56,8 +53,6 @@ class IntegrationTest {
 			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url", oAuthServer::getDiscoveryUrl)
 			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
 
-			registry.add("altinn.koordinator-service-code") { altinnKoordinatorServiceKode }
-			registry.add("altinn.veileder-service-code") { altinnVeilederServiceKode }
 			registry.add("altinn.url", mockAltinnHttpClient::serverUrl)
 			registry.add("altinn.api-key") { "test-altinn-api-key" }
 

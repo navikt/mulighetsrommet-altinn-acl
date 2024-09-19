@@ -68,7 +68,7 @@ class RolleService(
 				.associateWith { rolle ->
 					val organisasjonerMedRolle =
 						try {
-							altinnClient.hentAlleOrganisasjoner(norskIdent, rolle.serviceCode)
+							altinnClient.hentAlleOrganisasjoner(norskIdent)
 						} catch (e: Exception) {
 							log.warn("Klarte ikke hente rolle $rolle for ny bruker", e)
 							return@associateWith emptyList()
@@ -105,7 +105,7 @@ class RolleService(
 		RolleType.entries.forEach { rolle ->
 			val organisasjonerMedRolle =
 				try {
-					altinnClient.hentAlleOrganisasjoner(norskIdent, rolle.serviceCode)
+					altinnClient.hentAlleOrganisasjoner(norskIdent)
 				} catch (e: Exception) {
 					log.warn("Klarte ikke oppdatere roller for bruker $id og roller $rolle, bruker lagrede roller om eksisterer", e)
 					return

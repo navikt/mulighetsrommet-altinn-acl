@@ -29,7 +29,7 @@ class RolleRepositoryTest {
 	internal fun `createRolle - returns correct rolle`() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
-		val rolle = repository.createRolle(personId, organisasjonsnummer, RolleType.KOORDINATOR)
+		val rolle = repository.createRolle(personId, organisasjonsnummer, RolleType.TILTAK_ARRANGOR_REFUSJON)
 
 		rolle.organisasjonsnummer shouldBe organisasjonsnummer
 	}
@@ -38,7 +38,7 @@ class RolleRepositoryTest {
 	internal fun `invalidateRolle - Sets validTo to current timestamp - does not return from getValidRules`() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
-		val rolle = repository.createRolle(personId, organisasjonsnummer, RolleType.KOORDINATOR)
+		val rolle = repository.createRolle(personId, organisasjonsnummer, RolleType.TILTAK_ARRANGOR_REFUSJON)
 		repository.invalidateRolle(rolle.id)
 
 		val gyldigeRoller =

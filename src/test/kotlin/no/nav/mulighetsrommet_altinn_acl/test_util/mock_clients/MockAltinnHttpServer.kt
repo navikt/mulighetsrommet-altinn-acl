@@ -1,63 +1,50 @@
 package no.nav.mulighetsrommet_altinn_acl.test_util.mock_clients
 
-import no.nav.mulighetsrommet_altinn_acl.client.altinn.pagineringSize
 import okhttp3.mockwebserver.MockResponse
 
 class MockAltinnHttpServer : MockHttpServer(name = "Altinn Mock Server") {
-	private val personJson =
-		"""
-		{
-			"Name": "LAGSPORT PLUTSELIG ",
-			"Type": "Person",
-			"SocialSecurityNumber": "11111111111"
-		}
-		""".trimIndent()
-
 	fun addReporteeResponse(
 		personIdent: String,
-		serviceCode: String,
 		organisasjonnummer: List<String>,
 	) {
 		addResponseHandler(
-			path = "/api/serviceowner/reportees?subject=$personIdent&serviceCode=$serviceCode&serviceEdition=1&\$top=$pagineringSize&\$skip=0",
-			generateReporteeResponse(organisasjonnummer),
+			path = "/accessmanagement/api/v1/resourceowner/authorizedparties?includeAltinn2=true",
+			generateReporteeResponse(personIdent, organisasjonnummer),
 		)
 	}
 
-	fun addFailureResponse(
-		personIdent: String,
-		serviceCode: String,
-		responseCode: Int,
-	) {
+	fun addFailureResponse(responseCode: Int) {
 		addResponseHandler(
-			path = "/api/serviceowner/reportees?subject=$personIdent&serviceCode=$serviceCode&serviceEdition=1&\$top=$pagineringSize&\$skip=0",
+			path = "/accessmanagement/api/v1/resourceowner/authorizedparties?includeAltinn2=true",
 			response = MockResponse().setResponseCode(responseCode),
 		)
 	}
 
-	private fun generateReporteeResponse(organisasjonnummer: List<String>): MockResponse {
+	private fun generateReporteeResponse(
+		personId: String,
+		organisasjonnummer: List<String>,
+	): MockResponse {
 		val body =
 			if (organisasjonnummer.isEmpty()) {
 				"""
 				[
-					$personJson
+					${generatePersonJson(personId)}
 				]
 				""".trimIndent()
 			} else {
 				StringBuilder()
 					.append("[")
-					.append(personJson)
+					.append(generatePersonJson(personId))
 					.append(",")
 					.append(
 						organisasjonnummer.joinToString(",") {
 							"""
 							{
-								"Name": "NAV NORGE AS",
-								"Type": "Business",
-								"OrganizationNumber": "$it",
-								"ParentOrganizationNumber": "5235325325",
-								"OrganizationForm": "AAFY",
-								"Status": "Active"
+								"name": "UEMOSJONELL KREATIV TIGER AS",
+								"type": "Organization",
+								"organizationNumber": "$it",
+								"authorizedResources": ["tiltak-arrangor-refusjon"],
+								"subunits": []
 							}
 							""".trimIndent()
 						},
@@ -69,4 +56,15 @@ class MockAltinnHttpServer : MockHttpServer(name = "Altinn Mock Server") {
 			.setResponseCode(200)
 			.setBody(body)
 	}
+
+	private fun generatePersonJson(personIdent: Any): String =
+		"""
+		{
+			"name": "LAGSPORT PLUTSELIG ",
+			"type": "Person",
+			"personId": "$personIdent",
+			"authorizedResources": [],
+			"subunits": []
+		}
+		""".trimIndent()
 }

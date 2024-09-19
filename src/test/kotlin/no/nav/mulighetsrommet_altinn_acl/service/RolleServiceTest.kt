@@ -3,7 +3,7 @@ package no.nav.mulighetsrommet_altinn_acl.service
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
-import no.nav.mulighetsrommet_altinn_acl.domain.RolleType.KOORDINATOR
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType.TILTAK_ARRANGOR_REFUSJON
 import no.nav.mulighetsrommet_altinn_acl.domain.RollerIOrganisasjon
 import no.nav.mulighetsrommet_altinn_acl.repository.PersonRepository
 import no.nav.mulighetsrommet_altinn_acl.repository.RolleRepository
@@ -36,7 +36,7 @@ class RolleServiceTest : IntegrationTest() {
 		val norskIdent = UUID.randomUUID().toString()
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, listOf(organisasjonsnummer))
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
@@ -44,19 +44,19 @@ class RolleServiceTest : IntegrationTest() {
 
 		roller.size shouldBe 1
 
-		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(roller, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 
 		val databasePerson = personRepository.get(norskIdent)!!
 		databasePerson.lastSynchronized.days() shouldBe ZonedDateTime.now().days()
 
-		hasRolleInDatabase(databasePerson.id, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolleInDatabase(databasePerson.id, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 	}
 
 	@Test
 	internal fun `getRollerForPerson - not exist and no roller in Altinn - don't save person`() {
 		val norskIdent = UUID.randomUUID().toString()
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, emptyList())
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, emptyList())
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
@@ -76,7 +76,7 @@ class RolleServiceTest : IntegrationTest() {
 		rolleRepository.createRolle(
 			personId = personDbo.id,
 			organisasjonsnummer = organisasjonsnummer,
-			rolleType = KOORDINATOR,
+			rolleType = TILTAK_ARRANGOR_REFUSJON,
 		)
 
 		rolleService.getRollerForPerson(norskIdent)
@@ -91,11 +91,11 @@ class RolleServiceTest : IntegrationTest() {
 		personRepository.create(norskIdent)
 		personRepository.setSynchronized(norskIdent)
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, listOf(organisasjonsnummer))
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(roller, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 
 		mockAltinnHttpClient.requestCount() shouldBe 1
 	}
@@ -106,17 +106,17 @@ class RolleServiceTest : IntegrationTest() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
 		val personDbo = personRepository.create(norskIdent)
-		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
+		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON)
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf())
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, emptyList())
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe false
+		hasRolle(roller, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe false
 
-		val invalidKoordinator = rolleRepository.hentRollerForPerson(personDbo.id).find { it.rolleType == KOORDINATOR }!!
+		val invalidTiltakArrangor = rolleRepository.hentRollerForPerson(personDbo.id).find { it.rolleType == TILTAK_ARRANGOR_REFUSJON }!!
 
-		invalidKoordinator.validTo shouldNotBe null
+		invalidTiltakArrangor.validTo shouldNotBe null
 	}
 
 	@Test
@@ -125,13 +125,13 @@ class RolleServiceTest : IntegrationTest() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
 		val personDbo = personRepository.create(norskIdent)
-		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
+		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON)
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, listOf(organisasjonsnummer))
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(roller, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 	}
 
 	@Test
@@ -140,25 +140,25 @@ class RolleServiceTest : IntegrationTest() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 
 		val personDbo = personRepository.create(norskIdent)
-		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
+		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON)
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf())
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, emptyList())
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
 		roller.isEmpty() shouldBe true
 
 		mockAltinnHttpClient.resetHttpServer()
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, KOORDINATOR.serviceCode, listOf(organisasjonsnummer))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, listOf(organisasjonsnummer))
 
 		val updatedRoller = rolleService.getRollerForPerson(norskIdent)
 
-		hasRolle(updatedRoller, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(updatedRoller, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 
 		val databaseRoller =
 			rolleRepository
 				.hentRollerForPerson(personDbo.id)
-				.filter { it.rolleType == KOORDINATOR }
+				.filter { it.rolleType == TILTAK_ARRANGOR_REFUSJON }
 
 		databaseRoller.size shouldBe 2
 	}
@@ -169,14 +169,14 @@ class RolleServiceTest : IntegrationTest() {
 		val organisasjonsnummer = UUID.randomUUID().toString()
 		val personDbo = personRepository.create(norskIdent)
 
-		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, KOORDINATOR)
+		rolleRepository.createRolle(personDbo.id, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON)
 
-		mockAltinnHttpClient.addFailureResponse(norskIdent, KOORDINATOR.serviceCode, 500)
+		mockAltinnHttpClient.addFailureResponse(500)
 
 		val roller = rolleService.getRollerForPerson(norskIdent)
 
 		mockAltinnHttpClient.requestCount() shouldBe 1
-		hasRolle(roller, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(roller, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 
 		val updatedPersonDbo = personRepository.get(norskIdent)
 

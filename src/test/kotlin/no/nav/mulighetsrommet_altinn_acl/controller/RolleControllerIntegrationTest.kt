@@ -1,7 +1,6 @@
 package no.nav.mulighetsrommet_altinn_acl.controller
 
 import io.kotest.matchers.shouldBe
-import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
 import no.nav.mulighetsrommet_altinn_acl.test_util.IntegrationTest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -63,7 +62,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 
 		mockMaskinportenHttpClient.enqueueTokenResponse()
 
-		mockAltinnHttpClient.addReporteeResponse(norskIdent, RolleType.KOORDINATOR.serviceCode, listOf(orgnr))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, listOf(orgnr))
 
 		val response =
 			sendRequest(
@@ -75,7 +74,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 
 		val expectedJson =
 			"""
-			{"roller":[{"organisasjonsnummer":"$orgnr","roller":["KOORDINATOR"]}]}
+			{"roller":[{"organisasjonsnummer":"$orgnr","roller":["TILTAK_ARRANGOR_REFUSJON"]}]}
 			""".trimIndent()
 
 		response.code shouldBe 200
@@ -84,24 +83,24 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 
 	@Test
 	fun `hentTiltaksarrangorRoller - should return cached response from altinn`() {
-		val personIdent = "12345678910"
+		val norskIdent = "12345678910"
 		val orgnr = "1234567"
 
 		mockMaskinportenHttpClient.enqueueTokenResponse()
 
-		mockAltinnHttpClient.addReporteeResponse(personIdent, RolleType.KOORDINATOR.serviceCode, listOf(orgnr))
+		mockAltinnHttpClient.addReporteeResponse(norskIdent, listOf(orgnr))
 
 		val response1 =
 			sendRequest(
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
-				body = """{"personident": "$personIdent"}""".toRequestBody(mediaTypeJson),
+				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
 				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}"),
 			)
 
 		val expectedJson =
 			"""
-			{"roller":[{"organisasjonsnummer":"$orgnr","roller":["KOORDINATOR"]}]}
+			{"roller":[{"organisasjonsnummer":"$orgnr","roller":["TILTAK_ARRANGOR_REFUSJON"]}]}
 			""".trimIndent()
 
 		response1.code shouldBe 200

@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.mulighetsrommet_altinn_acl.client.altinn.AltinnClient
 import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
-import no.nav.mulighetsrommet_altinn_acl.domain.RolleType.KOORDINATOR
+import no.nav.mulighetsrommet_altinn_acl.domain.RolleType.TILTAK_ARRANGOR_REFUSJON
 import no.nav.mulighetsrommet_altinn_acl.domain.RollerIOrganisasjon
 import no.nav.mulighetsrommet_altinn_acl.jobs.AltinnUpdater
 import no.nav.mulighetsrommet_altinn_acl.jobs.leaderelection.LeaderElection
@@ -52,13 +52,13 @@ class AltinnUpdaterTests {
 		personRepository.create(personligIdent)
 
 		every {
-			altinnClient.hentAlleOrganisasjoner(personligIdent, KOORDINATOR.serviceCode)
+			altinnClient.hentAlleOrganisasjoner(personligIdent)
 		} returns listOf(organisasjonsnummer)
 
 		altinnUpdater.update()
 
 		val oppdaterteRettigheter = rolleService.getRollerForPerson(personligIdent)
-		hasRolle(oppdaterteRettigheter, organisasjonsnummer, KOORDINATOR) shouldBe true
+		hasRolle(oppdaterteRettigheter, organisasjonsnummer, TILTAK_ARRANGOR_REFUSJON) shouldBe true
 	}
 
 	private fun hasRolle(
