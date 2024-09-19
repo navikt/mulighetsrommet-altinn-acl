@@ -1,10 +1,12 @@
-# AMT Altinn ACL
+# Mulighetsrommet Altinn ACL
+Tjeneste for å hente tilganger fra Altinn 
 
 ## Legge til testdata
 
 For å legge til permanent testdata i cachen for å ikke gjøre oppslag mot Altinn så
 kan man kjøre følgende SQL:
 
+# TODO Fiks insert her til å matche på ressursId og ikke serviceCode
 ```sql
 insert into rettigheter_cache(norsk_ident, data_version, expires_after, data_json)
 values ('<fnr>', 2, to_timestamp('3000-01-01', 'YYYY-MM-DD'),

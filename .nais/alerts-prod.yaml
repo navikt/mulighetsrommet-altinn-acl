@@ -1,36 +1,36 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: amt-altinn-acl-alerts
-  namespace: amt
+  name: mulighetsrommet-altinn-acl-alerts
+  namespace: team-mulighetsrommet
   labels:
-    team: amt
+    team: team-mulighetsrommet
 spec:
   groups:
-    - name: amt-altinn-acl-alerts
+    - name: mulighetsrommet-altinn-acl-alerts
       rules:
         - alert: applikasjon nede
-          expr: kube_deployment_status_replicas_available{deployment="amt-altinn-acl"} == 0
+          expr: kube_deployment_status_replicas_available{deployment="mulighetsrommet-altinn-acl"} == 0
           for: 2m
           annotations:
             summary: "App {{ $labels.deployment }} er nede i namespace {{ $labels.namespace }}"
             action: "`kubectl describe pod -l app={{ $labels.deployment}}` -> `kubectl logs -l app={{ $labels.deployment}}`"
           labels:
-            namespace: amt
+            namespace: team-mulighetsrommet
             severity: critical
         - alert: høy feilrate i logger
-          expr: (100 * sum by (app, namespace) (rate(log_messages_errors{app="amt-altinn-acl",level="Error"}[3m])) / sum by (app, namespace) (rate(log_messages_total{app="amt-altinn-acl"}[3m]))) > 10
+          expr: (100 * sum by (app, namespace) (rate(log_messages_errors{app="mulighetsrommet-altinn-acl",level="Error"}[3m])) / sum by (app, namespace) (rate(log_messages_total{app="mulighetsrommet-altinn-acl"}[3m]))) > 10
           for: 3m
           annotations:
-            action: "Sjekk loggene til app amt-altinn-acl i namespace amt, for å se hvorfor det er så mye feil"
+            action: "Sjekk loggene til app mulighetsrommet-altinn-acl i namespace team-mulighetsrommet, for å se hvorfor det er så mye feil"
           labels:
-            namespace: amt
+            namespace: team-mulighetsrommet
             severity: warning
         - alert: feil logges
-          expr: sum by(app, namespace) (increase(log_messages_errors{app="amt-altinn-acl",level="Error"}[5m])) > 0
+          expr: sum by(app, namespace) (increase(log_messages_errors{app="mulighetsrommet-altinn-acl",level="Error"}[5m])) > 0
           for: 5m
           annotations:
-            action: "Sjekk loggene til app amt-altinn-acl i namespace amt, for å se hva som feiler"
+            action: "Sjekk loggene til app mulighetsrommet-altinn-acl i namespace amt, for å se hva som feiler"
           labels:
-            namespace: amt
+            namespace: team-mulighetsrommet
             severity: warning
