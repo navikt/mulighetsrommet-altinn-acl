@@ -30,7 +30,7 @@ spec:
           expr: sum by(app, namespace) (increase(log_messages_errors{app="mulighetsrommet-altinn-acl",level="Error"}[5m])) > 0
           for: 5m
           annotations:
-            action: "Sjekk loggene til app mulighetsrommet-altinn-acl i namespace amt, for å se hva som feiler"
+            action: "Sjekk loggene til app mulighetsrommet-altinn-acl i namespace team-mulighetsrommet, for å se hva som feiler"
           labels:
             namespace: team-mulighetsrommet
             severity: warning
