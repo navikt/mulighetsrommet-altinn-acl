@@ -12,7 +12,7 @@ services:
             "httpServer": "NettyWrapper",
             "tokenCallbacks": [
                 {
-                    "issuerId": "azuread",
+                    "issuerId": "tokenx",
                     "tokenExpiry": 31536000,
                     "requestMappings": [
                         {

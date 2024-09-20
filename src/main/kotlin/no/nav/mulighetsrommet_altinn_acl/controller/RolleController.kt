@@ -17,7 +17,7 @@ class RolleController(
 	private val rolleService: RolleService,
 ) {
 	@PostMapping("/tiltaksarrangor")
-	@ProtectedWithClaims(issuer = Issuer.AZURE_AD)
+	@ProtectedWithClaims(issuer = Issuer.TOKEN_X)
 	fun hentTiltaksarrangorRoller(
 		@RequestBody hentRollerRequest: HentRollerRequest,
 	): HentRollerResponse {

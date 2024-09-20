@@ -50,8 +50,8 @@ class IntegrationTest {
 			mockAltinnHttpClient.start()
 			mockMaskinportenHttpClient.start()
 
-			registry.add("no.nav.security.jwt.issuer.azuread.discovery-url", oAuthServer::getDiscoveryUrl)
-			registry.add("no.nav.security.jwt.issuer.azuread.accepted-audience") { "test-aud" }
+			registry.add("no.nav.security.jwt.issuer.tokenx.discovery-url", oAuthServer::getDiscoveryUrl)
+			registry.add("no.nav.security.jwt.issuer.tokenx.accepted-audience") { "test-aud" }
 
 			registry.add("altinn.url", mockAltinnHttpClient::serverUrl)
 			registry.add("altinn.api-key") { "test-altinn-api-key" }
