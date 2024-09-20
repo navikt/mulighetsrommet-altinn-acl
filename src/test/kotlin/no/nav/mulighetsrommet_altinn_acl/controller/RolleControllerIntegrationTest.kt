@@ -28,19 +28,6 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 	}
 
 	@Test
-	fun `hentTiltaksarrangorRoller - should return 403 when not machine-to-machine request`() {
-		val response =
-			sendRequest(
-				method = "POST",
-				path = "/api/v1/rolle/tiltaksarrangor",
-				body = """{"personident": "12345678910"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken()}"),
-			)
-
-		response.code shouldBe 403
-	}
-
-	@Test
 	fun `hentTiltaksarrangorRoller - returnerer 400 hvis personident har feil format`() {
 		val norskIdent = "1234567891K"
 
@@ -49,7 +36,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXM2MToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken()}"),
 			)
 
 		response.code shouldBe 400
@@ -69,7 +56,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXM2MToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken()}"),
 			)
 
 		val expectedJson =
@@ -95,7 +82,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXM2MToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken()}"),
 			)
 
 		val expectedJson =
