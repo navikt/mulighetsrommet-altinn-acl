@@ -10,7 +10,6 @@ spec:
   port: 8080
   ingresses:
     - https://mulighetsrommet-altinn-acl.intern.dev.nav.no
-
   prometheus:
     enabled: true
     path: /internal/prometheus
@@ -51,6 +50,7 @@ spec:
     inbound:
       rules:
         - application: mulighetsrommet-api
+        - application: arrangor-flate
     outbound:
       external:
         - host: tt02.altinn.no
@@ -63,9 +63,19 @@ spec:
         databases:
           - name: mulighetsrommet-altinn-acl
             envVarPrefix: DB
+  tokenx:
+    enabled: true
   maskinporten:
     enabled: true
     scopes:
       consumes:
         - name: "altinn:authorization/authorize"
         - name: "altinn:accessmanagement/authorizedparties.resourceowner"
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
