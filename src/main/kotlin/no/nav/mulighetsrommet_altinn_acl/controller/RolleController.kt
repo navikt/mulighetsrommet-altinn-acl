@@ -1,7 +1,6 @@
 package no.nav.mulighetsrommet_altinn_acl.controller
 
 import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
-import no.nav.mulighetsrommet_altinn_acl.service.AuthService
 import no.nav.mulighetsrommet_altinn_acl.service.RolleService
 import no.nav.mulighetsrommet_altinn_acl.utils.Issuer
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/rolle")
 class RolleController(
-	private val authService: AuthService,
 	private val rolleService: RolleService,
 ) {
 	@PostMapping("/tiltaksarrangor")
@@ -21,7 +19,6 @@ class RolleController(
 	fun hentTiltaksarrangorRoller(
 		@RequestBody hentRollerRequest: HentRollerRequest,
 	): HentRollerResponse {
-		authService.verifyRequestIsMachineToMachine()
 		hentRollerRequest.validatePersonident()
 
 		val roller = rolleService.getRollerForPerson(hentRollerRequest.personident)

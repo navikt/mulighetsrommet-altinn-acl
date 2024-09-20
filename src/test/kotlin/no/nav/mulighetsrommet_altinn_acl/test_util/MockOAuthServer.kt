@@ -1,6 +1,5 @@
 package no.nav.mulighetsrommet_altinn_acl.test_util
 
-import no.nav.mulighetsrommet_altinn_acl.service.AuthService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
 
@@ -32,15 +31,4 @@ open class MockOAuthServer {
 		audience: String = "test-aud",
 		claims: Map<String, Any> = emptyMap(),
 	): String = server.issueToken(tokenXIssuer, subject, audience, claims).serialize()
-
-	fun issueTokenXM2MToken(
-		subject: String = "test",
-		audience: String = "test-aud",
-		claims: Map<String, Any> = emptyMap(),
-	): String {
-		val claimsWithRoles = claims.toMutableMap()
-		claimsWithRoles["roles"] = arrayOf(AuthService.ACCESS_AS_APPLICATION_ROLE)
-
-		return server.issueToken(tokenXIssuer, subject, audience, claimsWithRoles).serialize()
-	}
 }
