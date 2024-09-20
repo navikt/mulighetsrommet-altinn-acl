@@ -5,7 +5,7 @@ import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
 
 open class MockOAuthServer {
-	private val azureAdIssuer = "azuread"
+	private val tokenXIssuer = "tokenx"
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
@@ -21,19 +21,19 @@ open class MockOAuthServer {
 		}
 	}
 
-	fun getDiscoveryUrl(issuer: String = azureAdIssuer): String = server.wellKnownUrl(issuer).toString()
+	fun getDiscoveryUrl(issuer: String = tokenXIssuer): String = server.wellKnownUrl(issuer).toString()
 
 	fun shutdown() {
 		server.shutdown()
 	}
 
-	fun issueAzureAdToken(
+	fun issueTokenXToken(
 		subject: String = "test",
 		audience: String = "test-aud",
 		claims: Map<String, Any> = emptyMap(),
-	): String = server.issueToken(azureAdIssuer, subject, audience, claims).serialize()
+	): String = server.issueToken(tokenXIssuer, subject, audience, claims).serialize()
 
-	fun issueAzureAdM2MToken(
+	fun issueTokenXM2MToken(
 		subject: String = "test",
 		audience: String = "test-aud",
 		claims: Map<String, Any> = emptyMap(),
@@ -41,6 +41,6 @@ open class MockOAuthServer {
 		val claimsWithRoles = claims.toMutableMap()
 		claimsWithRoles["roles"] = arrayOf(AuthService.ACCESS_AS_APPLICATION_ROLE)
 
-		return server.issueToken(azureAdIssuer, subject, audience, claimsWithRoles).serialize()
+		return server.issueToken(tokenXIssuer, subject, audience, claimsWithRoles).serialize()
 	}
 }

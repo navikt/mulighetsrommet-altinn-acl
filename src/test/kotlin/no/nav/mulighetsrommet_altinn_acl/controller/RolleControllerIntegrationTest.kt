@@ -34,7 +34,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "12345678910"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXToken()}"),
 			)
 
 		response.code shouldBe 403
@@ -49,7 +49,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXM2MToken()}"),
 			)
 
 		response.code shouldBe 400
@@ -69,7 +69,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXM2MToken()}"),
 			)
 
 		val expectedJson =
@@ -95,7 +95,7 @@ class RolleControllerIntegrationTest : IntegrationTest() {
 				method = "POST",
 				path = "/api/v1/rolle/tiltaksarrangor",
 				body = """{"personident": "$norskIdent"}""".toRequestBody(mediaTypeJson),
-				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueAzureAdM2MToken()}"),
+				headers = mapOf("Authorization" to "Bearer ${oAuthServer.issueTokenXM2MToken()}"),
 			)
 
 		val expectedJson =
