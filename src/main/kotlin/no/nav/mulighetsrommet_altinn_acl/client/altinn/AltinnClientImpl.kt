@@ -71,7 +71,6 @@ class AltinnClientImpl(
 			}
 
 			val authorizedParties = fromJsonString<List<AuthorizedParty>>(body)
-			log.info("authorizedParties: $authorizedParties") // TODO Fjern meg
 			return getAllOrganizationNumbers(authorizedParties)
 		}
 	}
@@ -80,7 +79,7 @@ class AltinnClientImpl(
 		@JsonAlias("organizationNumber")
 		val organisasjonsnummer: String? = null,
 		val type: String,
-		val authorizedResources: List<String>, // TODO Kan vi type denne til vår ressurs-id?
+		val authorizedResources: List<String>,
 		val subunits: List<AuthorizedParty>,
 	)
 
@@ -92,7 +91,6 @@ class AltinnClientImpl(
 			}
 			organizationNumbers.addAll(getAllOrganizationNumbers(party.subunits))
 		}
-		log.info("Hentet ${organizationNumbers.size} organisasjonsnummer fra Altinn: ${organizationNumbers.joinToString(", ")}") // TODO Fjern meg
 		return organizationNumbers
 	}
 }

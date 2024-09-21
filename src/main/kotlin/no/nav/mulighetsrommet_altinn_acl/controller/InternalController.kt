@@ -26,9 +26,6 @@ class InternalController(
 		}
 	}
 
-	/**
-	 * TODO Juster requestParam til å bruke ressursId istedenfor serviceCode
-	 */
 	@Unprotected
 	@GetMapping("/altinn/organisasjoner")
 	fun hentOrganisasjoner(
