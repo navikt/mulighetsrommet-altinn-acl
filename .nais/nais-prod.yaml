@@ -62,7 +62,7 @@ spec:
   leaderElection: true
   env:
     - name: ALTINN_URL
-      value: https://www.altinn.no
+      value: https://altinn.no
   envFrom:
     - secret: altinn-api-key
   tokenx:
