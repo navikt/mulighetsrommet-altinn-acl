@@ -5,6 +5,7 @@ import no.nav.common.rest.client.RestClient
 import no.nav.mulighetsrommet_altinn_acl.domain.RolleType
 import no.nav.mulighetsrommet_altinn_acl.utils.JsonUtils.fromJsonString
 import no.nav.mulighetsrommet_altinn_acl.utils.SecureLog.secureLog
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -40,6 +41,8 @@ class AltinnClientImpl(
 					"$baseUrl/accessmanagement/api/v1/resourceowner/authorizedparties?includeAltinn2=true",
 				).addHeader("Ocp-Apim-Subscription-Key", altinnApiKey)
 				.addHeader("Authorization", "Bearer ${maskinportenTokenProvider.invoke()}")
+				.addHeader("Content-Type", "application/json")
+				.addHeader("accept", "application/json")
 				.post(
 					"""
 					{
@@ -47,7 +50,7 @@ class AltinnClientImpl(
 						"value": "$norskIdent"
 					}
 					""".trimIndent()
-						.toRequestBody(),
+						.toRequestBody(contentType = "application/json".toMediaTypeOrNull()),
 				).build()
 
 		client.newCall(request).execute().use { response ->
