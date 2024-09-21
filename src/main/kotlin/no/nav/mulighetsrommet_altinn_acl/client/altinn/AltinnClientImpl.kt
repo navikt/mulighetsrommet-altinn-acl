@@ -71,7 +71,7 @@ class AltinnClientImpl(
 			}
 
 			val authorizedParties = fromJsonString<List<AuthorizedParty>>(body)
-			println("authorizedParties: $authorizedParties") // TODO Fjern meg
+			log.info("authorizedParties: $authorizedParties") // TODO Fjern meg
 			return getAllOrganizationNumbers(authorizedParties)
 		}
 	}
