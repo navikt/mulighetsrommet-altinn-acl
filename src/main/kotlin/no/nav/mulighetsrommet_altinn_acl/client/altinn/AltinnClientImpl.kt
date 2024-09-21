@@ -71,6 +71,7 @@ class AltinnClientImpl(
 			}
 
 			val authorizedParties = fromJsonString<List<AuthorizedParty>>(body)
+			println("authorizedParties: $authorizedParties") // TODO Fjern meg
 			return getAllOrganizationNumbers(authorizedParties)
 		}
 	}
@@ -91,6 +92,7 @@ class AltinnClientImpl(
 			}
 			organizationNumbers.addAll(getAllOrganizationNumbers(party.subunits))
 		}
+		log.info("Hentet ${organizationNumbers.size} organisasjonsnummer fra Altinn: ${organizationNumbers.joinToString(", ")}") // TODO Fjern meg
 		return organizationNumbers
 	}
 }
