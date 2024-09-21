@@ -53,7 +53,7 @@ spec:
         - application: arrangor-flate
     outbound:
       external:
-        - host: tt02.altinn.no
+        - host: platform.tt02.altinn.no
         - host: test.maskinporten.no
   gcp:
     sqlInstances:
